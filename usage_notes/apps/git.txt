@@ -1,0 +1,35 @@
+# Config
+git config --global -l
+git config -l
+git config --global asdf.qwer "affor6giog4of"
+git config --global --unset <configname>
+git config --global --edit
+
+# log
+git log
+git log --oneline
+git log --format='%C(blue)%cd %C(yellow)%h%Creset %s' --date=format:'%Y-%m-%d'
+
+# misc
+git reset file(s)  # Ångra en git add
+git diff --cached  # last commit vs added files
+git add -p [file]  # Add parts of file(s)
+git clone [--bare] path/to/repo [path/where/to/create]
+git commit --amend [-m 'message']  # Max 50 chars, max 72 chars on following lines
+git tag v1.2.3
+git tag -f v1.2.3  # Flytta en befintlig tag till den aktiva commit:en.
+
+# Gör om lokal git-repo till ett git-repo på git.ilait.se
+root@git# git new --bare /var/git/...       # Skapar tom git-repo
+git remote new origin git:/var/git/...      # Ifall repo inte har origin
+git remote set-url origin git:/var/git/...  # Ifall repo redan har origin
+
+# https://ohshitgit.com/
+# https://chris.beams.io/posts/git-commit/
+# https://github.com/alexkaratarakis/gitattributes
+
+# Hämta ut filer från git som en tar-ball till stdout
+git archive master [--remote=ssh://SERVER/REPO_PATH] [--prefix=FOLDER/]  # Okomprimerad tar, till stdout
+git archive HEAD ...
+git archive "$(hash="$(git stash create)";echo "${hash:-master}")" ... ; git gc --prune=now
+git ls-files -z | xargs -0 tar c --to-stdout

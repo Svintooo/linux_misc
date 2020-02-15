@@ -1,0 +1,7 @@
+#Bash
+
+websites=( asdf asdf asdf )
+for i in "${websites[@]}"; do
+  curl --silent -IL "$i" | grep '^HTTP' | tail -n 1 | grep -q 200
+  [[ "$?" != "0" ]] && echo "$i"
+done

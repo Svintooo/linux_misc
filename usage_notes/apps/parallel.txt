@@ -1,0 +1,19 @@
+# parallel
+# https://www.gnu.org/software/parallel/parallel_tutorial.html
+#
+# Run commands in parallel
+# 'commands' refer to normal commands that can be executed from the terminal
+
+# ]$ parallel COMMAND ::: ARG1 ARG2   # Will run 'COMMAND ARG1' and 'COMMAND ARG2' in parallel.
+parallel echo ::: asdf qwer zxcv
+
+# ]$ parallel ::: COMMAND1 COMMAND2   # Will run COMMAND1 and COMMAND2 in parallel.
+parallel ::: 'echo hello' pwd
+
+# ]$ parallel COMMAND ::: ARG1A ARG1B ::: ARG2A ARG2B   # Run arg combinations in parallel (COMMAND ARG1A ARG2A, ...)
+parallel echo ::: asdf qwer zxcv ::: 111 222 333
+
+# Same as above, but not as many combinations (hard to explain, just run and see for yourself)
+parallel --link echo ::: asdf qwer zxcv ::: 111 222 333
+parallel echo ::: asdf qwer zxcv :::+ 111 222 333
+

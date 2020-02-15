@@ -1,0 +1,5 @@
+# Print extended attributes
+getfattr -d <file>
+
+# Get explicit user group info
+stat -c '%U(%u) %G(%g)' <file>

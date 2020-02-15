@@ -1,0 +1,6 @@
+# Jump between multiple open files
+:n  # Next
+:p  # Prev
+
+# Open file in nano
+v

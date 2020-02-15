@@ -1,0 +1,5 @@
+pl <yt-playlist-id>   # Ladda en youtube playlist
+add 1-50              # Lägg in track 1 till 50 i en temporär lokal playlist
+n                     # Visa fler tracks för youtube-playlisten
+vp                    # Switcha över till den temporära playlisten
+save <playlist_name>  # Spara den nuvarande visade playlisten till en fil med namn <playlist_name>.m3u

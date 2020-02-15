@@ -1,0 +1,37 @@
+# Lägg till användare
+useradd ...
+useradd -G GROUP ...  # För at lägga till extra grupper
+
+# Lägg till grupper
+groupadd GROUP
+
+# Gör användare medlemmar i grupper
+usermod -a -G GROUP,GROUP,GROUP USER   # Lägg till gruppe till en användare
+gpasswd -a USER GROUP                  # Lägg till en användare till en grupp
+
+# Lista alla användare
+sudo passwd -Sa
+cat /etc/passwd
+sed -r 's/:.*//' /etc/passwd
+
+# Lista alla grupper
+getent group
+
+# Lista grupper för en användare
+groups USER
+
+# Se en användares id-nummer
+id USER
+
+# Se systemets alla grupper
+getent group
+
+# Byt namn på en grupp
+groupmod -n NEWGROUP OLDGROUP
+
+# Ta bort grupp
+groupdel GROUP
+
+# Ta bort användare från en grupp
+gpasswd -d USER GROUP
+

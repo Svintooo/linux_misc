@@ -1,0 +1,3 @@
+encoded_uri = "asdf"
+decoded_uri = URI.unescape(encoded_uri)
+puts decoded_uri

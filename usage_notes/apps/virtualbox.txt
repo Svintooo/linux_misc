@@ -1,0 +1,19 @@
+# Manual
+https://www.virtualbox.org/manual/
+
+# Aktivera KSM
+sudo bash -c 'echo 1 > /sys/kernel/mm/ksm/run'
+echo 'w /sys/kernel/mm/ksm/run - - - - 1' | sudo tee /etc/tmpfiles.d/ksm.conf
+
+# Ändra storlek på en disk.vdi
+#OBS: Disken måste vara registrerad i VirtualBox
+VBoxManage modifyhd path/to/disk.vdi --resize <size-in-mb>
+
+# Skapa en virtual router (NET Service)
+VBoxManage list natnetworks
+VBoxManage natnetwork add --netname natnet1 --network "192.168.15.0/24" # Skapa router
+VBoxManage natnetwork modify --netname natnet1  # modifiera befintlig router
+  #flaggor: --dhcp on/off
+            --port-forward-4/--port-forward-6 "<name>:tcp:[<host-ip(blank is ok)]:<host-port>:[<vm-ip>]:<vm-port>"
+            --port-forward-4/--port-forward-6 delete <name>
+VBoxManage natnetwork start/stop/remove --netname natnet1  #OBS: remove tar inte bort en dhcp-server på en router

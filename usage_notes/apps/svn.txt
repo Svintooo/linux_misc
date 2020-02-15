@@ -1,0 +1,5 @@
+# Download specific folder från github.com
+svn checkout --quiet https://github.com/<user>/<project>/trunk/<path>/ # Master branch
+svn checkout --quiet https://github.com/<user>/<project>/trunk/<path>/ <new-local-folder>
+svn checkout --quiet https://github.com/<user>/<project>/tags/<tag-name>/<path>/
+svn ls https://github.com/<user>/<project>/  # See all available folders

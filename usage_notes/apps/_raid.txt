@@ -1,0 +1,9 @@
+## mdadm
+# see status
+cat /proc/mdstat
+
+# scrubbing
+echo check > /sys/block/md0/md/sync_action  # Start scrub
+echo idle > /sys/block/md0/md/sync_action   # Stop a running scrub
+cat /sys/block/md0/md/mismatch_cnt          # See scrub report (bad blocks)
+

@@ -1,0 +1,4 @@
+#NOTE: Can read files generated with tcpdump
+
+# HTTP/2
+Analyze -> Decode As... -> Current: HTTP2

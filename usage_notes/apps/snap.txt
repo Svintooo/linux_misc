@@ -1,0 +1,3 @@
+snap find <word>
+snap install <name> [--classic]
+snap refresh  # updates all installed snaps

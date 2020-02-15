@@ -1,0 +1,23 @@
+syntax on
+set syntax=json
+set mouse=
+:goto <char-offset>
+
+# Set highlighting syntax for the file (useful if file doesn't have a filename extension)
+vim <file> -s <(echo ":set syntax=json")
+
+# Pilar
+←↓↑→ = HJKL
+
+# Split
+:sp   # split
+:vsp  # vertical split
+
+# Byt split
+ctrl-w + piltangenter
+ctrl+w + w  # Toggle
+
+# Radera till nästa tom rad
+d}
+# Radera till slutet på filen
+dG

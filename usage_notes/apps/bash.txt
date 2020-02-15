@@ -1,0 +1,123 @@
+## Error handling while coding
+https://stackoverflow.com/questions/64786/error-handling-in-bash
+
+## Check if running in an interactive terminal
+[ -t 1 ]
+
+## Maybe use when writing scripts
+set -Eeuxo pipefail  # https://vaneyckt.io/posts/safer_bash_scripts_with_set_euxo_pipefail/
+shopt -s extglob
+
+## Get script dir (taken from a script on the net)
+script_name="${0##*/}"
+script_dir="$(dirname "$0")"
+script_real_dir="$(dirname $(readlink -f "$0"))"
+script_real_dir="$(dirname $(realpath "$0"))"
+
+## List all defined functions
+declare -F  # Names only
+declare -f  # Names and definitions
+
+## Create Arrays
+<variable>=()          # Indexed array
+declare -a <variable>  # Indexed array
+declare -A <variable>  # Associate array
+mapfile -t array_name < <( code that generates output, each line gets its own index in the array )
+IFS=';' read -ra   # Create array from stdin-data (split on IFS).
+
+## Make * match dot-files
+shopt -s dotglob; command; shopt -u dotglob
+( shopt -s dotglob ; command )
+GLOBIGNORE=.:.. ; command ; unset GLOBIGNORE
+( GLOBIGNORE=.:.. ; command )
+
+## Loop over files with whitespaces in names
+IFS=$'\n\t'
+for file in ./* ; do
+  [ -e "$file" ] || continue
+  <code>
+done
+unset IFS
+
+## Variables
+#More: https://www.digitalocean.com/community/tutorials/how-to-read-and-set-environmental-and-shell-variables-on-a-linux-vps
+printenv             # Print only environment variables
+set                  # Print shell, environmental, and local variables; and shell functions
+(set -o posix; set)  # Print shell and environmental variables
+
+## Cool
+$ read a _ <<< "MAC evbyminsd58df" ; echo "$a"
+MAC
+$ echo "MAC evbyminsd58df" | { read a _; echo "$a"; }
+MAC
+
+## Input
+read -p "Enter two numbers : " x y
+
+## Print out AND store stdout and stderr
+#NOTE: Does not work if the CODE process removes itself from the current process and continue running independently
+exec 5>&1
+exec 6>&2
+eval "$(
+  CODE-HERE 2> >(t_err="$(tee >(cat - >&6))"; typeset -p t_err) \
+             > >(t_out="$(tee >(cat - >&5))"; typeset -p t_out)
+  t_ret="$?"; typeset -p t_ret
+)"
+exec 6>&-
+exec 5>&-
+echo "$t_out"
+echo "$t_err"
+echo "$t_ret"
+
+
+## Explicitly fetch stdin
+... code ... < "${1:-/dev/stdin}"'
+
+## Trim whitespaces
+var="${var#"${var%%[![:space:]]*}"}"  # Left trim
+var="${var%"${var##*[![:space:]]}"}"  # Right trim
+
+## Check if variable contains a substring
+# bash:
+[[ "$variable" == *"$substring"* ]]
+# bash, dash, ksh, ash (busybox):
+[ -z "${variable##*$substring*}" ] && [ -z "$substring" -o -n "$variable" ]
+case "$variable" in (*$substring*) <CODE> ;; esac
+
+## Misc variable checks
+[ -n "$variable" ] OR [ "$variable" ]  # Variable is not empty
+[ -z "$variable" ]                     # Variable is empty
+[ -z "${variable+x}" ]                 # Variable exist
+
+## Hashed executable paths
+hash -r                # clear everything
+hash -d <name-of-exe>  # Only remove hash for one executable
+
+## array to delimited string
+array=(a b c d e)
+echo "$( IFS=","; echo "${array[*]}" )"
+
+## Change case
+# https://stackoverflow.com/questions/2264428/how-to-convert-a-string-to-lower-case-in-bash#2265268
+echo "${var,,}"  # Lower case
+echo "${var^^}"  # Upper case
+
+## Check if bin exists in PATH
+which bin       # Writes to stderr if not found
+command -v bin  # Also reports on shell buuiltin commands
+type -P bin     # Best: Does not write error message, and does not report on shell builtins
+
+## Parse config files in bash
+# Method 1: using source (Warn: dangerous if config contains code)
+source config.sh
+# Method 2: using env (Warn: quotes are seen as literal characters)
+mapfile -t args < <( sed -E '/^\s*(#|$)/d' config.sh )
+declare $(env -i "${args[@]}")
+unset args
+
+## Terminal escape sequence regexp
+# Used for terminal colors and more
+escseq='('$'\e''([@A-Z\[\\^_]|\])[0-9:;<=>?]*[-!"#$%&()*,./'"'"']*([@A-Z\[\\^_`a-z{|}~]|\]))'
+# remove colors from stdin
+... | sed -E "s/$escseq//g"
+

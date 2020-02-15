@@ -1,0 +1,14 @@
+# Låt inte webbsidor blocka copy/paste
+dom.event.clipboardevents.enabled
+
+# Låt inte webbsidor blocka högerklicksmenyn
+dom.event.contextmenu.enabled
+
+# stäng av pocket
+extensions.pocket.enabled
+
+# förhindra att du stänger FF av misstag
+browser.showQuitWarning
+
+# Go back with backspace
+browser.backspace_action => 0

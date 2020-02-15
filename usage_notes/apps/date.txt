@@ -1,0 +1,11 @@
+# Convert from Unix time
+date -d '@1540455396'
+
+# Convert to unix time
+date -d <date> +'%s'
+
+# Sane default output format
+date --rfc-3339=s
+
+# Swedish timezone (see: ls /usr/share/zoneinfo/)
+TZ="Europe/Stockholm" date

@@ -1,0 +1,9 @@
+ssh -l user host -p 22001
+ssh -o StrictHostKeyChecking ...
+
+ssh-copy-id -i ~/.ssh/user@localhost.pub user@remotehost -p 22001
+
+# Verify host fingerprint
+ssh-keygen -l -f /etc/ssh/ssh_host_...
+
+ssh -o StrictHostKeyChecking=no ...

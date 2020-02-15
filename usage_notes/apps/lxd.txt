@@ -1,0 +1,70 @@
+# Lista remote repositories
+lxc remote list
+
+# Lista operating system images som finns via dina remote repositories
+lxc image list images:  # NOTE: Kolon är inte ditskrivet av misstag
+lxc image list images: <sökterm> [-c lLfpdasu] [--format (csv|json|table|yaml)]
+lxc image list images: <key>=<exact-value>  # Ex: alias=archlinux ELLER alias=debian/10/arm64
+lxc image list images: | grep -B1 -A1 -i -e FINGERPRINT -e <sökterm>
+
+# Ladda hem en image. OBS: Detta görs automatiskt om man kör en image som inte finns lokalt.
+lxc image copy images:opensuse/42.3 local: --alias=opensuse-42.3
+
+# Ändra lokalt alias på en image
+lxc image alias create <nytt-alias> <image-fingerprint>  # Se lxc image list för fingerprint
+lxc image alias delete <gammalt-alias>
+
+# Lista lokala images (/var/lib/lxd/images/)
+lxc image list
+
+# Starta en image (image laddas automatiskt hem om den inte finns lokalt)
+lxc launch <alias> <nytt-unikt-container-namn>
+
+# Lista containers (/var/lib/lxd/storage-pools/*/containers/)
+lxc list
+
+# Snapshots (/var/lib/lxd/storage-pools/*/snapshots/)
+lxc snapshot <container> <snapshot>
+lxc info <container> --verbose
+lxc list [<container>] --format=json | jq -r '.[].snapshots[].name'
+lxc copy <container>/<snapshot> <new-container>
+
+# Gå in i en container
+lxc exec <container-namn> -- /bin/bash -l
+
+# START STOP
+lxc start <container-namn>
+lxc stop <container-namn>
+lxc restart <container-namn>
+
+# Ge container läs+skriv till en path på hosten
+lxc config device add <container-namn> <nytt-unikt-device-namn> disk source=/path/on/host path=/path/inside/container
+
+# Ett hack för att IPv4 ska fungera
+#https://wiki.archlinux.org/index.php?title=LXD&oldid=510289#No_ipv4_on_unprivileged_Arch_container
+lxc profile set default security.syscalls.blacklist "keyctl errno 38"
+
+# Låt containers köra containers (LXD inside LXD)
+lxc launch <image> <container> -c security.nesting=true
+lxc config set <container/profile> security.nesting true
+lxc config get <container/profile> security.nesting
+lxc config show <container/profile>  # För att verifiera att den är satt.
+
+# Låt containers komma åt /proc/sys/net/bridge/bridge-nf-call-iptables
+#Se instruktioner ovan
+linux.kernel_modules br_netfilter
+#Se även till att br_netfilter laddas automatiskt vid boot (detta är på hosten)
+#/lib/modules/*/modules.dep: kernel/net/bridge/br_netfilter.ko.xz
+sudo cat > /etc/modules-load.d/br_netfilter.conf <<EOF
+# Load br_netfilter.ko at boot
+br_netfilter
+EOF
+
+
+
+# networks
+lxc network list
+lxc network show lxdbr0  #default lxd network bridge
+#  ipv4.address är adressen som bridge:n får och nätverket som den ger ut DHCP på.
+#  ipv4.nat är om trafik ska NAT:as till host:ens nätverk, så containers kan surfa.
+lxc network list-leases lxdbr0

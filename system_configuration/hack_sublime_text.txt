@@ -1,0 +1,3 @@
+modifiera binären
+ersätt alla strängar med URL:er till sublimes hemsida
+ersätt med 127.0.0.1 eller liknande

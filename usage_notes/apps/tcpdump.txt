@@ -1,0 +1,14 @@
+tcpdump
+  -i <interface>
+  -n            # Don't translate ip addresses
+  <expression>  # Filter rules
+
+# expression
+<expr> and <expr>
+<expr> or <expr>
+<expr> or (<expr> and <expr>)
+! <expr>
+net x.x.x.x     # exact ip address
+net x.x.x.x/xx  # ip range
+port xx
+arp

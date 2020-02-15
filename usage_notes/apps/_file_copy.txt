@@ -1,0 +1,50 @@
+cp [path/]file path/[file]
+cp -R/-r/--recursive path/ path/
+   -p/--preserve[=mode,ownership,timestamps]
+      --preserve=mode,ownership,timestamps,context,links,xattr
+      --preserve=all
+cp -d/--no-dereference --preserve=links  #Följ inte symlänkar
+cp -a/--archive/-dR --preserve=all
+cp -t PATH/--target-directory=PATH  #Förtydligar vart saker ska kopieras till
+cp -v/--verbose
+cp --version
+
+
+scp -3 user@host1:/path/file user@host2:/path/[file]  #Kopiering mellan vå hosts går via local host.
+scp -C  #Compression
+scp -l  #Bandwidth limit
+scp -P  #Port
+scp -p  #Preserve timestamps and modes
+scp -r  #Recursive, follows symlinks
+        #NOTE: Ingen skillnad mellan 'path' och 'path/'
+scp user@host:"'/path/with & for/example'" ...   #This is a way to use special characters in the path
+
+
+rsync --dry-run -v/--verbose
+rsync -q/--quiet          #Only error messages
+rsync --progress          #Progress bar
+rsync -h/--human-readable #Human readable numbers/sizes
+rsync -z/--compress       #man kan också ställa in hur hårt den ska compressa och filter för filer som inte ska compressas.
+rsync -l/--links          #Preserve symlinks
+rsync -L/--copy-links     #Transform symlinks to symlink targets
+rsync -c/--checksum       #Skip based on checksum, not mod-time and size
+rsync -r/--recursive
+      -r path1 path2[/]   #Kopierar hela mappen path1 in till path2/
+      -r path1/ path2[/]  #Kopierar endast innehållet i path1/ till path2/
+
+rsync -p/--perms          #Preserve permissions
+rsync -X/--xattrs         #Preserve extended attributes
+rsync -u/--update         #Skip if receiver file exists and not older
+rsync -o/--owner          #Preserve owner
+rsync -g/--group          #Preserve group
+rsync -t/--times          #Preserve timestamps
+rsync -D/--devices --specials  #Also copy special/device files
+rsync -a/--archive/-rlptgoD
+
+rsync --exclude=PATTERN   # * not slashes. ** include slashes. ? only one character (no slashes). [] and [[:asdf:]] as in regex.
+rsync --include=PATTERN   # path/*** is the same as path/ + path/** (the folder itself and everything inside) (very similar to -r/-a)
+
+rsync --version
+
+Example: recursively copy only *.sh and *.txt files
+  rsync -r server:/path/ --include=*{/,.sh,.txt} --exclude=* local-folder/

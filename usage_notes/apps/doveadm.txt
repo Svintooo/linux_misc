@@ -1,0 +1,6 @@
+List folders:  doveadm mailbox list   -u asdf@qwer.com
+List messages: doveadm mailbox status -u asdf@qwer.com 'messages' '*'
+List sizes:    doveadm mailbox status -u asdf@qwer.com 'messages vsize' '*'
+List all:      doveadm mailbox status -u asdf@qwer.com 'all' '*'
+Create folder: doveadm mailbox create -u asdf@qwer.com Test
+Delete folder: doveadm mailbox delete -u asdf@qwer.com Test

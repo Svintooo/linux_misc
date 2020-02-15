@@ -1,0 +1,245 @@
+## Importera DNS-records från GENERATE-poster
+
+dns_records_strings = [
+  '$GENERATE 1-254 $.98.225.109.in-addr.arpa. IN PTR h109-225-98-$.wholesale.se.alltele.net.'
+]
+
+ttl = 14400
+
+domain_name = {
+  :regexp  => /.*?([0-9]+)\.([0-9]+)\.([0-9]+)\.in-addr\.arpa/,
+  :replace => '\1.\2.\3.in-addr.arpa'
+}
+
+partner = Customer.find(119_102)  # Driftkund Broadview AB - AllTele
+partner.name
+partner.id
+
+dns_records = []
+
+
+
+# Konvertera till Array
+dns_record_arrays = dns_records_strings.inject([]) do |array, row|
+  row = row.gsub(/\s+IN\s+/, "\tIN\t")
+  row = row.gsub(/\t\t+/,"\t")
+  record = row.split(/\s+/)
+  if record[0] =~ /^\$generate$/i
+    #http://www.zytrax.com/books/dns/ch8/generate.html
+    #"start-stop[/step]" => "start", "stop", "step"
+    start, stop, step = record[1].split(/[-\/]/).collect{|s| s.to_i}
+    step ||= 1
+    # "$[{offset[,width[,type]]}]" => "$"
+    record[2..-1].each{|string| string.gsub!(/[$][{][^}]*[}]/, "$")}
+    #generate
+    start.step(stop, step).each do |value|
+      array << record[2..-1].collect{|string| string.gsub(/[$]/, value.to_s)}
+    end
+  else
+    array << record
+  end
+  array
+end.inject([]) do |array, record|
+  if record[0] =~ /^\$origin$/i
+    origin = record[1] if record[1] != "."
+  elsif record[0] =~ /^\$ttl$/i
+    record[0] = record[0].downcase
+    array << record
+  else
+    record[0] = record[0].strip.gsub(/\.?$/,".#{ origin }") if record[0] != "" && !(record[0] =~ /\.$/) && !(record[0] =~ /#{ origin }$/)
+    array << record
+  end
+  array
+end ; dns_record_arrays.count
+
+
+
+dns_record_arrays.count
+dns_record_arrays.first
+dns_record_arrays.last
+
+
+
+# Parse:a datan i arrayen och spara allt i variabeln dns_records
+dns_record_arrays.each{|record|
+  record = record.clone
+  if record[0] == "$ttl"
+    ttl = record[1]
+    if ttl =~ /[^0-9]/  # innehåller annat än bara siffror
+      #Konvertera till sekunder
+      ttl_value, ttl_format = ttl.split(/(?=[a-z])/i)  # Ex: "30M" => "30", "M"
+      ttl = (ttl_value.to_i * time_conversion_table[ttl_format.downcase]).to_s
+    end
+    next
+  end
+  new_record = {}
+  new_record[:name       ] = record.shift.gsub(/\.$/, "")
+  new_record[:domain_name] = new_record[:name].gsub(domain_name[:regexp], domain_name[:replace])
+  string = record.shift
+  if string =~ /^[0-9]+$/
+    new_record[:ttl] = string
+    string = record.shift
+  else
+    new_record[:ttl] = ttl
+  end
+  string = record.shift if string =~ /IN/i
+  if string.nil?
+    puts "ERROR: File contains errors, skipping. #{file_name}"
+    next
+  end
+  new_record[:record_type] = string.upcase
+  if new_record[:record_type] =~ /mx/i
+    new_record[:prio] = record.shift
+  else
+    new_record[:prio] = "0"
+  end
+  new_record[:content] = record.join(" ")
+  new_record[:content] += ".#{ new_record[:domain_name] }" if ["CNAME","MX"].include?(new_record[:record_type]) && !(new_record[:content] =~ /\.$/)
+  new_record[:content] = new_record[:content].gsub(/\.$/, "")
+  dns_records << new_record
+} ; dns_records.count
+
+
+
+dns_records.count
+dns_records.first
+dns_records.last
+
+
+domain_names = dns_records.collect{|record| record[:domain_name] }.sort.uniq
+
+
+
+####################################################################
+# Finns alla domännamn i backend och ligger de under rätt partner? #
+####################################################################
+domain_names.all? do |dname|
+  domain = Domain.find_by_name(dname)
+  domain && domain.customer.parent_id == partner.id
+end
+
+
+
+##########################################################
+#  Öka tillåtna antalet för DNS-records (om det behövs)  #
+##########################################################
+domain_names.each do |dname|
+  domain = Domain.find_by_name(dname)
+  new_dns_records_count = dns_records.select{|record| record[:domain_name] == domain.name }.count
+  next if domain.blank?
+  if new_dns_records_count > domain.hosting_plan.dns_records
+    p(domain.name, "Domain Hosting Plan, allowed DnsRecords: #{domain.hosting_plan.dns_records}", "DnsRecords already existing: #{domain.dns_records.count}", "DnsRecord count to be created: #{new_dns_records_count}")
+    puts
+  end
+end
+
+#old_dns_max = HostingPlan.find(1).dns_records
+#HostingPlan.find(1).update_attributes(:dns_records => 10_000)
+
+
+
+#############################
+#   Validera DNS-posterna   #
+#############################
+dns_records.all? do |record|
+  raise unless record[:domain_name] =~ domain_name[:regexp]
+  domain = Domain.find_by_name(record[:domain_name])
+  dns_record = domain.dns_records.new(
+    :name        => record[:name       ],
+    :record_type => record[:record_type],
+    :content     => record[:content    ],
+    :ttl         => record[:ttl        ],
+    :prio        => record[:prio       ],
+    :dns_record_plan_id => 1
+  )
+  p(dns_record, dns_record.errors.to_a) if !dns_record.valid?
+  dns_record.valid?
+end
+
+dns_records.any? do |record|
+  count = DnsRecord.where('name = ? AND content = ?', record[:name], record[:content]).count
+  count > 0
+end
+
+dns_records.any? do |record|
+  count = DnsRecord.where('name = ? AND record_type = ?', record[:name], record[:record_type]).count
+  count > 0
+end
+
+dns_records.any? do |record|
+  count = DnsRecord.where('name = ?', record[:name]).count
+  count > 0
+end
+
+dns_records.sum do |record|
+  domain = Domain.find_by_name(record[:domain_name])
+  domain.dns_records.where('name = ? AND record_type = ?', record[:name], record[:record_type]).count != 0 ? 1 : 0
+end
+dns_records.sum do |record|
+  domain = Domain.find_by_name(record[:domain_name])
+  domain.dns_records.where('name = ? AND record_type = ?', record[:name], record[:record_type]).count
+end
+
+
+##############################
+#   Uppdatera DNS-posterna   #
+##############################
+i = 0
+index_width = dns_records.count.to_s.length
+dns_records.each do |record|
+  domain = Domain.find_by_name(record[:domain_name])
+  begin
+    domain.dns_records.where(
+      :name        => record[:name       ],
+      :record_type => record[:record_type]
+    ).first.update_attributes!(
+      :content     => record[:content    ]
+    )
+    i += 1
+    if i % 250 == 0  # Pause
+      print "#{ i.to_s.rjust(index_width) }st DNS Records updated."
+      gets
+    end
+  rescue => e
+    puts
+    puts e.class.name + ": " + e.message
+    p record
+    gets  # Pause
+  end
+end.count
+
+##########################
+#   Skapa DNS-posterna   #
+##########################
+i = 0
+index_width = dns_records.count.to_s.length
+dns_records.each do |record|
+  domain = Domain.find_by_name(record[:domain_name])
+  begin
+    domain.dns_records.create!(
+      :name        => record[:name       ],
+      :record_type => record[:record_type],
+      :content     => record[:content    ],
+      :ttl         => record[:ttl        ],
+      :prio        => record[:prio       ],
+      :dns_record_plan_id => 1
+    )
+    i += 1
+    if i % 50 == 0  # Pause
+      print "#{ i.to_s.rjust(index_width) }st DNS Records created."
+      gets
+    end
+  rescue => e
+    puts
+    puts e.class.name + ": " + e.message
+    p record
+    gets  # Pause
+  end
+end.count
+
+
+
+##################################################################################
+#  Återställ maxantalet för DNS-records i hostingplanen (om den behövde ändras)  #
+##################################################################################
+#HostingPlan.find(1).update_attributes(:dns_records => old_dns_max)

@@ -1,0 +1,15 @@
+# precense
+>> "".presence || "default"
+=> "default"
+>> "a".presence || "default"
+=> "a"
+
+# dynamic method
+def method_missing(m, *args, &block)
+
+# Rails force db reconnect
+ActiveRecord::Base.connection.reconnect!
+
+# Rails turn off logger
+old_logger = ActiveRecord::Base.logger
+ActiveRecord::Base.logger = nil

@@ -1,0 +1,9 @@
+# Mount read-only
+mount -t ntfs /dev/asdf /mnt
+
+# Mount read-write
+#install ntfs-3g (all distribution should have it)
+mount -t ntfs-3g /dev/asdf /mnt
+
+# Fix errors mounting read-write
+ntfsfix -b -d /dev/asdf

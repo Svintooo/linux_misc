@@ -1,0 +1,5 @@
+## ext4 defragmentation
+# Check defrag status
+sudo e4defrag -c [folder OR file OR device]
+# run a defrag
+sudo e4defrag [folder OR file OR device]

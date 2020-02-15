@@ -1,0 +1,3 @@
+# Hämta ner en nyckel från en keyserver, samt skriv ut information om ägaren
+gpg --recv-keys <hash-string>
+

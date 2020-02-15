@@ -1,0 +1,7 @@
+sqlcmd -S mssql1.ilait.se -U USER -d DATABASE
+
+https://www.sqlshack.com/working-sql-server-command-line-sqlcmd/
+
+# ONLINE/OFFLINE
+https://blog.sqlauthority.com/2010/04/24/sql-server-t-sql-script-to-take-database-offline-take-database-online/
+https://stackoverflow.com/questions/31866585/how-to-bring-back-offline-database-in-sql-server-2008

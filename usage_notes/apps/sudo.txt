@@ -1,0 +1,4 @@
+# Redirect to file
+sudo sh -c 'code here > /path/to/file'
+code here | sudo tee /path/to/file > /dev/null
+

@@ -1,0 +1,197 @@
+
+#
+## Ruby on Rails
+#
+
+server_name = "apache16.ilait.se"
+
+(
+  server = Server.joins(:domain).where(
+    "CONCAT_WS('.', IF(LENGTH(servers.name), servers.name, NULL), domains.name) = ?",
+    server_name
+  ).first
+  raise "Serevr not found: '#{server_name}'" if server.blank?
+  puts "server=#{server.name}"
+  puts "log_paths=("
+  Website.joins(:user).where(users: {server_id: server.id}).each do |website|
+    datestamp = ""
+    letter = website.domain.name.gsub('.'+website.domain.top_level_domain.name, '').split('.').last[0]
+      puts"  #{website.fqdn}:/var/log/web/stats/#{ website.domain.top_level_domain.name }/#{ letter }/#{ website.fqdn }/logs"
+  end
+  puts ")"
+)
+
+
+
+#
+## bash on syslog1
+#
+
+## Init ##
+# Replace this with the result from the Ruby on Rails script
+server=
+log_paths=()
+
+
+## Verify ##
+for website_logpath in "${log_paths[@]}"; do
+  log_path="${website_logpath#*:}"
+  [[ -d "$log_path" ]] || echo "ERROR not found: $log_path"
+done
+
+
+## Functions ##
+function ilait_extract_apache_log_date() {
+  # [01/Sep/2019:01:40:46 +0000]  ->  20190901
+  awk '{print $4}' | sed -E -e 's,\[,,' -e 's,:.*,,' -e 's,^(.+)/(.+)/(.+)$,\3-\2-\1,' -e 's/-Jan-/-01-/' -e 's/-Feb-/-02-/' -e 's/-Mar-/-03-/' -e 's/-Apr-/-04-/' -e 's/-May-/-05-/' -e 's/-Jun-/-06-/' -e 's/-Jul-/-07-/' -e 's/-Aug-/-08-/' -e 's/-Sep-/-09-/' -e 's/-Oct-/-10-/' -e 's/-Nov-/-11-/' -e 's/-Dec-/-12-/' -e 's/-//g'
+}
+
+function ilait_convert_datestamp_to_apache_date() {
+  # 2019-09-01  ->  01/Sep/2019
+  local datestamp="$1"
+  echo "$datestamp" | sed -E \
+    -e 's/-01-/-Jan-/' -e 's/-02-/-Feb-/' -e 's/-03-/-Mar-/' -e 's/-04-/-Apr-/' -e 's/-05-/-May-/' -e 's/-06-/-Jun-/' -e 's/-07-/-Jul-/' -e 's/-08-/-Aug-/' -e 's/-09-/-Sep-/' -e 's/-10-/-Oct-/' -e 's/-11-/-Nov-/' -e 's/-12-/-Dec-/' \
+    -e 's,(.+)-(.+)-(.+),\3/\2/\1,'
+}
+
+function ilait_combine_apache_logs() {
+  local server="$1"
+  local datestamp="$2"
+
+  if ! [[ "$server" =~ ^[0-9a-zA-Z.]+$ ]]; then
+    echo >&2 "ERROR server: '$server'"
+    return 1
+  fi
+
+  if ! [[ "$datestamp" =~ ^[0-9]+-[0-9]+-[0-9]+$ ]]; then
+    echo >&2 "ERROR datestamp: '$datestamp'"
+    return 1
+  fi
+
+  log_path_errors=0
+  for website_logpath in "${log_paths[@]}"; do
+    log_path="${website_logpath#*:}"
+    if ! [[ -d "$log_path" ]]; then
+      echo >&2 "ERROR not found: $log_path"
+      log_path_errors=1
+    fi
+  done
+  if [[ "$log_path_errors" != 0 ]]; then
+    echo >&2 "Some paths in the array \$log_paths is invalid"
+    echo >&2 "!!!Aborting!!!"
+    return 1
+  fi
+
+  local datestamp_int="${datestamp//-/}"  # Remove all dashes (-) from the datestamp. Ex: 2019-09-01  ->  20190901
+  local datestamp_apache="$( ilait_convert_datestamp_to_apache_date "$datestamp" )"
+
+  declare -a log_files  # Find all relevant log files
+  local website log_path tmp_log_files i
+
+  (
+    for website_logpath in "${log_paths[@]}"; do
+      website="${website_logpath%%:*}"
+      log_path="${website_logpath#*:}"
+
+      mapfile -t tmp_log_files < <( find "$log_path"/ -name 'access.*' -newermt "$datestamp" -print0 | xargs -0 --no-run-if-empty ls -1tr | head -n 2 )
+      [[ "${#tmp_log_files[@]}" == 0 ]] && continue
+
+      local log_file="${tmp_log_files[0]}"
+
+      for i in "${!tmp_log_files[@]}"; do
+        [[ "$i" == 0 ]] && continue
+        local next_file="${tmp_log_files[$i]}"
+
+        local start_date="$( zcat "$log_file" | head -n 1 | ilait_extract_apache_log_date )"
+        local end_date="$( zcat "$next_file" | head -n 1 | ilait_extract_apache_log_date )"
+
+        if (( datestamp_int >= start_date && datestamp_int <= end_date )); then
+          zcat "$log_file" | grep -F "$datestamp_apache" | awk "{print \"$website \"\$0}"
+        fi
+
+        log_file="$next_file"
+      done
+
+      local start_date="$( zcat "$log_file" | head -n 1 | ilait_extract_apache_log_date )"
+      if (( datestamp_int >= start_date )); then
+        zcat "$log_file" | grep -F "$datestamp_apache" | awk "{print \"$website \"\$0}"
+      fi
+    done
+  ) | gzip > "$server".access.log."$datestamp_int".gz
+}
+
+
+## Exec ##
+ilait_combine_apache_logs "$server" 2019-09-01
+ilait_combine_apache_logs "$server" 2019-09-02
+ilait_combine_apache_logs "$server" 2019-09-03
+
+
+
+
+#
+# bash
+#
+
+mkdir -p  new pending archive
+
+scp root@syslog1:/root/hugo/*.gz new/
+ssh root@syslog1 'rm -i -- /root/hugo/*.gz'
+
+for log_file_gz in ./new/*.gz; do
+  log_filename="${log_file_gz%.gz}"
+  log_filename="$( basename "$log_filename" )"
+
+  echo -n "$log_filename"
+
+  if [[ -f ./archive/"$log_filename".csv.zip ]]; then
+    echo "ALREADY PARSED, SKIPPING: $log_file_gz."
+    continue
+  fi
+
+  (
+    echo 'website,remote_ip,datetime,request_string,status_code,bytes,referer,user_agent'
+    zcat "$log_file_gz" | perl -pe 's#^(\S+)\s+(\S+)\s+\S+\s+\S+\s+\[([^/]+)/([^/]+)/([^:]+):(.+?)\]\s+("\S+\s+\S+\s+\S+")\s+(\S+)\s+(\S+)\s+("(?:[^"]|\\")*")\s+(".*")#$1,$2,$5-$4-$3 $6,$7,$8,$9,$10,$11#;' | \
+         sed -E -e 's,([^\\])\\",\1"",g' \
+                -e 's/^(([^,]+),([^,]+),([^-]+)-)Jan/\101/' \
+                -e 's/^(([^,]+),([^,]+),([^-]+)-)Feb/\102/' \
+                -e 's/^(([^,]+),([^,]+),([^-]+)-)Mar/\103/' \
+                -e 's/^(([^,]+),([^,]+),([^-]+)-)Apr/\104/' \
+                -e 's/^(([^,]+),([^,]+),([^-]+)-)May/\105/' \
+                -e 's/^(([^,]+),([^,]+),([^-]+)-)Jun/\106/' \
+                -e 's/^(([^,]+),([^,]+),([^-]+)-)Jul/\107/' \
+                -e 's/^(([^,]+),([^,]+),([^-]+)-)Aug/\108/' \
+                -e 's/^(([^,]+),([^,]+),([^-]+)-)Sep/\109/' \
+                -e 's/^(([^,]+),([^,]+),([^-]+)-)Okt/\110/' \
+                -e 's/^(([^,]+),([^,]+),([^-]+)-)Nov/\111/' \
+                -e 's/^(([^,]+),([^,]+),([^-]+)-)Dec/\112/'
+  ) > ./pending/"$log_filename".csv.tmp
+
+  sed 1d ./pending/"$log_filename".csv.tmp | grep -q -Ev --line-buffered '^[^,]+,[0-9a-fA-F.:]+,'
+  if [[ "$?" == 0 ]]; then
+    echo "CSV CONVERSION FAILED: $log_file_gz."
+    rm -f ./pending/"$log_filename".csv.tmp
+    continue
+  fi
+
+  sed '1q' ./pending/"$log_filename".csv.tmp > ./archive/"$log_filename".csv
+  sed '1d' ./pending/"$log_filename".csv.tmp | sort --field-separator=, --key=2 >> ./archive/"$log_filename".csv
+
+  rm -f -- "$log_file_gz" ./pending/"$log_filename".csv.tmp
+
+  echo
+done
+
+
+
+
+
+
+
+
+
+
+
+
+
+

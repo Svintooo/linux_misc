@@ -1,0 +1,7 @@
+lsmod  # List loaded modules
+modinfo <module-name>
+systool -v -m <module-name>  # List options for a loaded module
+modprobe -c | less
+modprobe -c | grep <module-name>
+modprobe --show-depends <module-name>
+

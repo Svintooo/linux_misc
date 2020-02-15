@@ -1,0 +1,14 @@
+# Create cert files
+DOMAIN=*
+NAME=catch-all
+SIZE=4096
+openssl genrsa "$SIZE" > "$NAME".key.pem
+openssl req -new -x509 -nodes -sha1 -days 3650 -key "$NAME".key.pem > "$NAME".crt.pem
+#TODO: insert $DOMAIN here somewhere
+openssl x509 -noout -fingerprint -text < "$NAME".crt.pem > "$NAME".crt.info
+cat "$NAME".crt.pem "$NAME".key.pem > "$NAME".crt-key.pem
+chmod 400 "$NAME".key.pem "$NAME".crt-key.pem
+
+# s_client
+openssl s_client -connect www.domain.tld:https -CApath /etc/ssl
+openssl s_client -connect server-address:port -CApath /etc/ssl

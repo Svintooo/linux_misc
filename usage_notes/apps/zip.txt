@@ -1,0 +1,4 @@
+# Zippa en hel mapp
+zip -r filename.zip path/
+
+zip -e/--encrypt

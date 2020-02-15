@@ -1,0 +1,7 @@
+# Detta skriver ut allt i en fil
+cat file
+
+# Har man många filer kan man i stället använda head/tail för att splitta upp dom
+head -n -0 file1 file2 ...
+head -n +0 file1 file2 ...
+

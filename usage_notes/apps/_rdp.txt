@@ -1,0 +1,7 @@
+xfreerdp '/u:NCS\ilait' '/p:password' '/v:rdp.go-ncs.se'
+xfreerdp '/u:NCS\ilait' '/v:rdp.go-ncs.se'  # Will ask for password interactively
+
+xfreerdp '/cert-ignore' '/size:1280x960'  '/v:SERVER' '/u:USER' '/p:PASSWORD'
+
+# Om man i windows ska ange server-adress liknande "server.name.tld /adm"
+xfreerdp '/cert-ignore' '/size:1280x960'  '/v:SERVER' '/admin' '/u:USER'

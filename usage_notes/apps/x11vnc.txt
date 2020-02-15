@@ -1,0 +1,6 @@
+## Server ##
+x11vnc -ncache -forever -localhost -display :0
+
+## Client ##
+vncviewer -encodings "copyrect tight zrle hextile" localhost:0
+

@@ -1,0 +1,8 @@
+## Se boot errors
+# -b: boot
+# -p: priority
+journalctl -b -p err
+
+## Se errors för en viss unit (service)
+journalctl -u dhcpcd
+

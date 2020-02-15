@@ -1,0 +1,13 @@
+awk -F ';'  # Field separator
+
+awk '{print $0}'  # Print all fields
+awk '{print $1}'  # Print only the first field
+awk '{print $3}'  # Print only the 3:rd field
+
+awk '{print NF}'       # Print the number of fields
+awk '{print $NF}'      # Print the last field
+awk '{print $(NF-1)}'  # Print the next to last field
+
+awk 'NR==1{print $0}'  # Print only the first row
+awk 'NR==3{print $0}'  # Print only the 3:rd row
+awk 'END{print $0}'    # Print only the last row

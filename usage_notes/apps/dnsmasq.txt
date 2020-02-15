@@ -1,0 +1,7 @@
+## /etc/dnsmasq.conf
+#NOTE: This file can be told to load mora conf filer from a directory
+
+address=/www.asdf.com/127.0.0.1  # One address (and its sub addresses) to one IP.
+address=/#/192.168.0.5           # Wildcard. All addresses to one IP.
+
+

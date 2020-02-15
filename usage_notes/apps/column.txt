@@ -1,0 +1,9 @@
+# Align text output
+... | column -t         # The standard
+... | column -t -s '░'  # Set input delimiter
+... | column -t -o ' '  # Set output delimiter (default is 2 spaces)
+... | column -t -R 1    # Right align column 1
+... | column -t -T 3    # Truncate column 3
+... | column -t -W 2    # Wrap long texts in column 2
+... | column -t -H 5    # Hide column 5
+... | column -t -O 2,1  # Change column order

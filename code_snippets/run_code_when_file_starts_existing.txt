@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+inotifywait -m -e create,moved_to /path/to/dir/ \
+  | grep --color=none --line-buffered -F ' file.txt' \
+  | while read path action file; do echo "$path""$file"; done  # <-- CODE HERE

@@ -1,0 +1,68 @@
+#Rails Console
+
+websites = []  # Lista med website-objekt
+web_db = {}    # Innehåller en massa av: website.fqdn => database.name
+
+# Hjälpkod:
+# - stegar igenom alla webbsidorna en och en, väntar på att användaren ska trycka på enter
+# - skapar en ny databas
+# - skriver ut bashkod som kan köras manuellt för att kopiera databasen och byta databasuppgifter på webbsidan
+
+$logged_in_administrator = Administrator.find(2027)
+db_server_name = "mysql12.ilait.se"
+db_server = Server.joins(:domain).where("CONCAT(servers.name, \".\", domains.name) = ?", db_server_name).first
+
+websites.all?{|website| SqlDatabase.where(name: web_db[website.fqdn]).exists? }
+
+faulty_websites_dns_ilait.each do |website|
+  puts "#### #{website.fqdn} ####"
+  old_db = SqlDatabase.find_by(name: web_db[website.fqdn])
+  p old_db
+
+  db_notes = "Created by ilait, ticket 145105, #{website.fqdn}"
+
+  new_db = SqlDatabase.find_by(domain_id: website.domain.id, notes: db_notes)
+  if new_db.blank?
+    new_db = SqlDatabase.create!(
+      domain_id: website.domain.id,
+      sql_database_plan_id: 1,
+      site_id: db_server.site_id,
+      server_id: db_server.id,
+      notes: db_notes
+    )
+  end
+  new_db.password = new_db.password.gsub(/[;?]/,"_")
+  new_db.user.password_changed? && new_db.save!
+  p new_db
+
+  puts "# DB COPY"
+  puts "("
+  puts "  ssh -l root '#{old_db.server.fqdn}' 'mysqldump --opt --routines #{old_db.name}' > '#{old_db.name}.sql'"
+  puts "  sed -e 's/#{old_db.user.name}/#{new_db.user.name}/g' -e 's/#{old_db.name}/#{new_db.name}/g' '#{old_db.name}.sql' > '#{new_db.name}.sql'"
+  puts "  cat '#{new_db.name}.sql' | ssh -l root '#{new_db.server.fqdn}' 'mysql -u #{new_db.user.name} -p#{new_db.user.password} #{new_db.name}'"
+  puts "  rm -f '#{old_db.name}.sql' '#{new_db.name}.sql'"
+  puts ")"
+  puts "#"
+
+  puts "# WEBSITE DB CHANGE"
+  #Example web.confing:
+  # <add name="default" connectionString="Data Source=DBSERVER;user id=USERNAME;password=PASSWORD;database=DBNAME;use procedure bodies=false;" providerName="MySql.Data.MySqlClient" />
+  ftp_user = website.user.name
+  ftp_pass = website.user.password
+  ftp_server = website.user.server.fqdn
+  puts "("
+  puts "  ncftpget -u '#{ftp_user}' -p '#{ftp_pass}' -V '#{ftp_server}' ./ Content/web.config"
+  puts "  cp -p web.config web.config.bak"
+  puts "  sed -Ei -e '/connectionString=.*#{old_db.name}/s/Data Source=[^;]+;/Data Source=#{new_db.server.fqdn};/' web.config"
+  puts "  sed -Ei -e '/connectionString=.*#{old_db.name}/s/user id=[^;]+;/user id=#{new_db.user.name};/' web.config"
+  puts "  sed -Ei -e '/connectionString=.*#{old_db.name}/s/password=[^;]+;/password=#{new_db.user.password};/' web.config"
+  puts "  sed -Ei -e '/connectionString=.*#{old_db.name}/s/database=#{old_db.name};/database=#{new_db.name};/' web.config"
+  puts "  colordiff -urp web.config.bak web.config"
+  puts ")"
+  puts "ncftpput -u '#{ftp_user}' -p '#{ftp_pass}' -V '#{ftp_server}' Content/ web.config web.config.bak"
+  puts "rm -f web.config web.config.bak"
+  puts
+
+  print "Press enter to continue... "
+  gets
+end.count

@@ -1,0 +1,9 @@
+[user]
+	name = Hugo Ankarloo
+	email = hugo@ilait.se
+[log]
+	date = iso
+[color]
+	ui = auto
+[alias]
+	wdiff = diff --ws-error-highlight=all --color-words --word-diff-regex='[A-Za-z_]+|[0-9]+([.][0-9]+)?|[0-9]+(:[0-9]+)+|[^[:space:]]'

@@ -1,0 +1,90 @@
+# Motherboard
+sudo dmidecode -t 2
+
+# Disk
+smartctl -i /dev/sda
+
+# Misc
+lspci
+sudo dmidecode | less
+
+
+# CPU/RAM/Disk info helper functions
+#_remote_cpu_mem "server"
+#   Required dmidecode installed on remote server
+#_remote_hw_storage_info "server"
+#   Requires lshw installed on remote server
+
+function _remote_cpu_mem() {
+  local DATA="$(
+    ssh -o StrictHostKeyChecking=no -l root "$1" 2>&1 \
+        bash <<< 'cat /proc/cpuinfo; echo ¤¤¤¤¤¤¤¤¤¤¤; dmidecode -t memory' \
+        | grep -ivF -e 'X11 forwarding' -e 'Warning: Permanently added' -e 'error in locking authority file'
+  )"
+  grep -q -F 'ssh: ' <<<"$DATA" && { echo -e "$(grep -F 'ssh: ' <<<"$DATA")"' \t'"<$1>" >&2; return; }
+
+  local CPU="${DATA%¤¤¤¤¤¤¤¤¤¤¤*}"
+  local RAM="${DATA#*¤¤¤¤¤¤¤¤¤¤¤}"
+
+  local CPUx CPUm CPU_cores CPUc CPUht
+  CPUx="$( echo "$CPU" | grep -E '^physical id' | sort | uniq | wc -l )"
+  CPUm="$( echo "$CPU" | grep -E '^model name' | sed -E -e 's/^[^:]+:\s+//' -e 's/\((R|TM)\)//g' -e 's/ +/ /g' -e 's/ [Vv]([0-9])/v\1/' -e 's/ @ / /' | sort | uniq )"
+  CPU_cores="$( echo "$CPU" | grep -E '^cpu cores' | sed -E 's/^[^:]+:\s+//' |  sort | uniq )"
+  CPUc="$( case "$CPU_cores" in (1) echo " SingleCore";; (2) echo " DualCore";; (4) echo " QuadCore";; ("") echo ' ?-Core';; (*) echo ' '$CPU_cores-Core;; esac )"
+  CPUht="$( echo "$CPU" | grep -E '^flags' | sed -E 's/^[^:]+:\s+//' | sort | uniq | grep -q -oE '(^|\s)ht(\s|$)' && echo " HT" )"
+
+  local RAMx RAMsize RAMddr RAMspd RAMproduct
+  RAM="$( echo -e "$RAM\n" | sed -E -n -e '/^Memory Device/,/^$/p' | sed -E -e '/^$/!{H;d}' -e 'x' -e '/DIMM/!d' -e '/Size: .*[Nn]o [Mm]odule [In]nstalled/d' )"
+  RAMx="$( echo "$RAM" | grep -E '^Memory Device' | wc -l )"
+  RAMsize="$( echo "$RAM" | sed -E -e '/Size:/!d' -e 's/^[^:]+:\s+//' -e 's/ //' | sort | uniq | xargs echo | sed -E 's/\s+/,/g' )"
+  RAMsize="$( echo "$RAMsize" | awk '{ s=substr($1,1,length($1)-2); u=substr($1,length($1)-1); if(u=="KB") r=(s/1024/1024)"GB"; else if(u=="MB") r=(s/1024)"GB"; else r=$1; print r }' )"
+  RAMddr="$( echo "$RAM" | grep -oiE 'DDR[ 0-9]+' | sort | uniq | xargs echo | sed -E 's/\s+/,/g' )"
+  RAMspd="$( echo "$RAM" | sed -E -e '/^\s+Speed:/!d' -e 's/^[^:]+:\s+//' -e 's/ //' | sort | uniq | xargs echo | sed -E 's/\s+/,/g' )"
+  RAMproduct="$( echo "$RAM" | sed -E -e '/Part Number:/!d' -e 's/^[^:]+:\s+//' -e 's/ //' | sort | uniq | xargs echo | sed -E 's/\s+/,/g' )"
+
+  echo -n  "${CPUx}x ${CPUm}${CPUc}${CPUht}"
+  echo -ne " \t${RAMx}x ${RAMsize} ${RAMddr} \t${RAMspd} ${RAMproduct}"
+  echo -e  ' \t'"<$1>"
+}
+
+
+function _remote_hw_storage_info() {
+  echo "$1:"
+
+  local DATA="$(
+    ssh -o StrictHostKeyChecking=no -l root "$1" 'lshw -c disk; echo ¤¤¤¤¤¤¤¤; grep -H . /sys/block/*/queue/rotational;' 2>&1 \
+      | grep -ivF -e 'X11 forwarding' -e 'Warning: Permanently added' -e 'error in locking authority file'
+  )"
+  [[ "$?" != "0" ]] && {
+    echo "$DATA" | grep -F 'ssh:'
+    exit
+  }
+
+  local DISK_DATA="$( echo "$DATA" | sed -E -e '/¤¤¤¤¤¤¤¤/,$d' )"
+  local TYPE_DATA="$( echo "$DATA" | sed -E -e '1,/¤¤¤¤¤¤¤¤/d' -e 's,^/sys/block/([^/]+)/[^:]+:,\1=,' -e 's/=0/=ssd/' -e 's/=1/=hdd/' )"
+
+  declare -A HDD_SSD
+  local disk_spin
+  for disk_spin in $TYPE_DATA; do
+    local key="$(cut -d= -f1 <<< "$disk_spin")"  # Example: sda
+    local val="$(cut -d= -f2 <<< "$disk_spin")"  # hdd OR ssd
+    HDD_SSD[$key]="$val"
+  done
+
+  local disk_data_types='vendor:|logical name:|size:'
+  #local disk_data_types='vendor:|logical name:|product:|size:'
+
+  echo -e "$DISK_DATA\n" | sed -E -e '/^  \*-/s/^/\n/' \
+                         | sed -n -E -e '/\*-disk/,/^$/!d' \
+                                     -e '/product:/{s/.*samsung.*/vendor: Samsung/i;s/:.*intel.*/vendor: Intel/i;s/:.*supermicro.*/vendor: SuperMicro/i}' \
+                                     -e '/\*-disk/,/^$/{/'"$disk_data_types"'/{s/^[^:]+:\s+//;H}}' \
+                                     -e '/^$/{x;s/\n/, /g;p;s/.*//;x}' \
+                         | sed -E -e 's/^,?\s*/  /' \
+                                  -e 's,^(.+)/dev/([a-z]+)(.+)$,'"bash -c 'declare -A HDD_SSD; $( (set -o posix; set) | grep -F 'HDD_SSD=' ); echo \"\1\${HDD_SSD[\2]}\3\"',e" \
+                         | sort \
+                         | uniq -c \
+                         | sed -E -e 's/^(\s+[0-9]+)/\1x/' \
+                                  -e 's/\s*,\s*|\s+/ /g' \
+                                  -e 's/[0-9]+\w+\s+\(([^\)]+)\)/\1/'
+}
+

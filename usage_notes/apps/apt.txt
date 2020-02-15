@@ -1,0 +1,24 @@
+apt update             # Uppdatera listan med tillgängliga paket på remote server
+apt list --upgradable  # Lista uppgraderbara paket
+apt upgrade            # Uppgradera alla installerade paket
+apt dist-upgrade
+
+apt search <asdf>
+apt list --installed 'lx[cd]*'
+
+apt install <asdf>
+apt remove <package>
+apt autoremove  # tar bort alla paket som inte behövs längre
+
+# Check installed version, install different version
+apt policy <asdf>
+apt upgrade <asdf>=<version>
+
+apt show <packet>           # pacman -Si <packet>
+dpkg -S </path/to/file>     # pacman -Fs <file>
+apt-file search <path/file> # pacman -Fs <file>
+dpkg -L <packet>            # pacman -Ql <packet>
+dpkg -c <path/to/file.deb>  # tar tf <packet.file>
+apt-file list <packet>      # pacman -Fl <packet>
+
+dpkg -i <path/to/file.deb>  # pacman -U <path/to/file.tar.xz>

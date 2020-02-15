@@ -1,0 +1,4 @@
+#PowerShell
+
+PS D:\> Get-ChildItem -recurse -Path WebSites\*\Content\*.config | Select-String -pattern asdf,qwer,zxcv | group path | select name
+

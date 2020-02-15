@@ -1,0 +1,6 @@
+du -x --one-file-system
+   -h --human-readable
+   -s --summarize
+
+#Ex:
+du -xhs * | sort -h

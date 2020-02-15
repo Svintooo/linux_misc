@@ -1,0 +1,19 @@
+# https://stedolan.github.io/jq/manual/
+cat <JSON> | jq --raw-output '.asdf.[] | select(.qwer == 2) | .name, .age'
+
+# Unix time to Swedish date (see: ls /usr/share/zoneinfo/)
+curl -s https://api.github.com/rate_limit | jq -r '"@"+"\(.rate.reset)"' | TZ="Europe/Stockholm" xargs date --rfc-3339=s -d
+
+# Use jq as a sed replacement
+... | sed -r -e 's/regex/repl/' -e 's/regex/repl/'
+... | jq -R -r 'gsub("regex";"repl") | gsub("regex";"repl")'
+
+# Misc examples
+curl -s https://api.github.com/repos/cilium/cilium/releases | jq -r 'map(select(.prerelease == false)) | sort_by(.published_at) | reverse | limit(10;.[]) | .tag_name+" "+.published_at' | column -t
+curl -s https://api.github.com/repos/cilium/cilium/releases | jq -r '.[].tag_name |= (. | sub("^v";"")) | map(select(.prerelease == false)) | sort_by(.tag_name) | reverse | limit(10;.[]) | .published_at+"  v"+.tag_name'
+
+#filename and picked values från each json-file
+for i in /opt/open-xchange/appsuite/apps/io.ox/core/date/* ; do jq --join-output '(.daysInFirstWeek|tostring)+" "+(.weekStart|tostring)+" "' "$i"; echo "$i"; done | column -t | sort
+
+#Get first inside object
+ ... | jq '[ .key_to_an_object[] ][0]'

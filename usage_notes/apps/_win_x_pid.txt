@@ -1,0 +1,5 @@
+# To find the PID of an X window
+xprop _NET_WM_PID
+
+# To find the X window of a PID
+wmctrl -l -p | grep PID | head -n 1 | awk '{ print $1 }' | xargs wmctrl -i -a

@@ -1,0 +1,23 @@
+#Rails Console
+
+# Generera bashkod som listar vilka databaser som alla websiter använder
+# Koden tankar hem websidornas web.config-fil och läser ut från den vilken databas som används
+(
+puts "("
+websites.each do |website|
+  ftp_user = website.user.name
+  ftp_pass = website.user.password
+  ftp_server = website.user.server.fqdn
+  puts "  echo '#{website.fqdn}'"
+  puts "  ncftpget -u '#{ftp_user}' -p '#{ftp_pass}' -V '#{ftp_server}' ./ Content/web.config"
+  puts "  [[ $? != 0 ]] && { echo 'FTP ERROR'; echo; exit 1; }"
+  puts "  grep web.config -e 'connectionString='"
+  puts "  rm -f web.config"
+  puts "  echo"
+end
+puts ")"
+)
+
+#Example row from web.config:
+#  <add name="default" connectionString="Data Source=DBSERVER;user id=USERNAME;password=PASSWORD;database=DBNAME;use procedure bodies=false;" providerName="MySql.Data.MySqlClient" />
+

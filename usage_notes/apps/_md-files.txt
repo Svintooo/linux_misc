@@ -1,0 +1,2 @@
+## Read markdown (*.md) files in a terminal
+pandoc README.md | lynx --stdin

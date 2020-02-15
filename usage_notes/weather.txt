@@ -1,0 +1,4 @@
+curl wttr.in/<location>
+curl wttr.in/<location>?0  # Only today's weather
+curl wttr.in/~<location-search>
+

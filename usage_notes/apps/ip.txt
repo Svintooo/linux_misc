@@ -1,0 +1,24 @@
+ip -c ...  # Color
+ip -br a   # Brief display of addresses
+ip r       # Routes
+
+# MORE: https://www.baturin.org/docs/iproute2/
+
+# Add addresses
+ip address add <ipv4>/<cidr> broadcast + dev <interface-name>  # Figures out broadcast address automatically
+ip address add <ipv6>/<cidr>             dev <interface-name>  # IPv6 has no broadcast address
+ip address delete ...  # Replace add with delete to remove
+
+# Bring interfaces up and down
+ip link set dev <interface-name> up
+ip link set dev <interface-name> down
+
+# Change link layer address (usually a MAC address)
+ip link set dev <interface-name> address <address>
+
+# Delete link
+ip link delete dev <interface-name>
+
+# ARP on/off
+ip link set <interface-name> arp on
+ip link set <interface-name> arp off

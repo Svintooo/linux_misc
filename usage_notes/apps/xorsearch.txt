@@ -1,0 +1,8 @@
+# Jag har installerat 2 coola verktyg
+xorsearch
+xorstrings
+
+# XORSearch är fixad via AUR, så den kommer nog uppdatera sig.
+# XORStrings är dock installerad manuellt. Kolla efter uppdateringar på den.
+
+http://blog.didierstevens.com/programs/xorsearch/

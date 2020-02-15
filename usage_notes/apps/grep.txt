@@ -1,0 +1,10 @@
+# Do not buffer, write to stdout on every new line
+grep --line-buffered
+# ripgrep can also force block buffering, which is normally not used when not pipe:ing
+rg --block-buffered
+
+# Misc
+-H, --with-filename
+-h, --no-filename
+-L, --files-without-match
+-l, --files-with-matches 

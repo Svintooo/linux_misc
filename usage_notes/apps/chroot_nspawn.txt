@@ -1,0 +1,18 @@
+# chroot
+#cd <dir>
+#mount -t proc /proc proc/
+#mount --rbind /sys sys/
+#mount --rbind /dev dev/
+#cp /etc/resolv.conf etc/resolv.conf
+chroot <dir> /bin/bash
+
+#arch-chroot
+#Samma som ovan, men inga förberedelser behöver göras (mountning m.m.)
+arch-chroot <dir> bash
+
+# systemd-nspawn
+#hostname kommer default:a till namnet på <dir>. Annars använd: -M name
+#Mer info: https://lwn.net/Articles/572957/
+systemd-nspawn -bD <dir>  # Bootar ett init-system inuti <dir> i en egen container. Du får t.o.m. logga in.
+systemd-nspawn -D <dir> /bin/bash  # Bootar <dir>/bin/bash i en egen container.
+

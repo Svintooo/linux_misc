@@ -1,0 +1,4 @@
+# Edit /etc/systemd/logind.conf
+HandlePowerKey=ignore
+HandleSuspendKey=ignore
+HandleHibernateKey=ignore

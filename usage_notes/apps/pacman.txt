@@ -1,0 +1,18 @@
+pacman -Syu
+pacman -Rs
+pacman -S
+pacman -Qm  # Only list locally installed packages
+pacman -Qt  # List installed packages
+
+# Rensa ut onödiga paket
+pacman -Qdt
+pacman -Rsn <package>
+pacman -Rsn $(pacman -Qdtq)
+
+# paket from AUR (foreign)
+pacman -Qm
+
+# Vad äger denna filen
+pacman -Qo /path/to/file
+
+checkupdates

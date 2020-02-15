@@ -1,0 +1,117 @@
+#
+## Ruby on Rails
+#
+
+server_name = "apache20.ilait.se"
+
+(
+  puts "log_paths=("
+  Website.joins(user: {server: :domain}).where(
+    "CONCAT_WS('.', IF(LENGTH(servers.name), servers.name, NULL), domains.name) = ?",
+    server_name
+  ).each do |website|
+    datestamp = ""
+    letter = website.domain.name.gsub('.'+website.domain.top_level_domain.name, '').split('.').last[0]
+      puts"  /var/log/web/stats/#{ website.domain.top_level_domain.name }/#{ letter }/#{ website.fqdn }/logs"
+  end
+  puts ")"
+)
+
+
+
+#
+## bash on syslog1
+#
+
+## Init ##
+datestamp=2019-09-01
+
+log_paths=()  # Replace this with the result from the Ruby on Rails script
+
+for log_path in "${log_paths[@]}"; do
+  [[ -d "$log_path" ]] || echo "ERROR not found: $log_path"
+done
+
+
+## Exec ##
+cd /root/hugo/
+
+function ilait_extract_apache_log_date() {
+  # [01/Sep/2019:01:40:46 +0000]  ->  20190901
+  awk '{print $4}' | sed -E -e 's,\[,,' -e 's,:.*,,' -e 's,^(.+)/(.+)/(.+)$,\3-\2-\1,' -e 's/-Jan-/-01-/' -e 's/-Feb-/-02-/' -e 's/-Mar-/-03-/' -e 's/-Apr-/-04-/' -e 's/-May-/-05-/' -e 's/-Jun-/-06-/' -e 's/-Jul-/-07-/' -e 's/-Aug-/-08-/' -e 's/-Sep-/-09-/' -e 's/-Oct-/-10-/' -e 's/-Nov-/-11-/' -e 's/-Dec-/-12-/' -e 's/-//g'
+}
+
+function ilait_convert_datestamp_to_apache_date() {
+  # 2019-09-01  ->  01/Sep/2019
+  local datestamp="$1"
+  echo "$datestamp" | sed -E \
+    -e 's/-01-/-Jan-/' -e 's/-02-/-Feb-/' -e 's/-03-/-Mar-/' -e 's/-04-/-Apr-/' -e 's/-05-/-May-/' -e 's/-06-/-Jun-/' -e 's/-07-/-Jul-/' -e 's/-08-/-Aug-/' -e 's/-09-/-Sep-/' -e 's/-10-/-Oct-/' -e 's/-11-/-Nov-/' -e 's/-12-/-Dec-/' \
+    -e 's,(.+)-(.+)-(.+),\3/\2/\1,'
+}
+
+datestamp_int="${datestamp//-/}"  # Remove all dashes (-) from the datestamp. Ex: 2019-09-01  ->  20190901
+datestamp_apache="$( ilait_convert_datestamp_to_apache_date "$datestamp" )"
+
+log_files=()  # Find all relevant log files
+for log_path in "${log_paths[@]}"; do
+  mapfile -t tmp_log_files < <( find "$log_path"/ -name 'access.*' -newermt "$datestamp" -print0 | xargs -0 --no-run-if-empty ls -1tr | head -n 2 )
+  [[ "${#tmp_log_files[@]}" == 0 ]] && continue
+
+  log_file="${tmp_log_files[0]}"
+
+  for i in "${!tmp_log_files[@]}"; do
+    [[ "$i" == 0 ]] && continue
+    next_file="${tmp_log_files[$i]}"
+    #echo >&2 "PARSING: $log_file"
+
+    start_date="$( zcat "$log_file" | head -n 1 | ilait_extract_apache_log_date )"
+    end_date="$( zcat "$next_file" | head -n 1 | ilait_extract_apache_log_date )"
+
+    if (( datestamp_int >= start_date && datestamp_int <= end_date )); then
+      echo >&2 "FOUND: $log_file"
+      log_files+=( "$log_file" )
+    fi
+
+    log_file="$next_file"
+  done
+
+  start_date="$( zcat "$log_file" | head -n 1 | ilait_extract_apache_log_date )"
+  if (( datestamp_int >= start_date )); then
+    echo "$log_file"
+    log_files+=( "$log_file" )
+  fi
+done
+unset log_path tmp_log_files i log_file next_file start_date end_date
+
+(
+  for log_file in "${log_files[@]}"; do
+    echo "$log_file" >&2
+    zcat "$log_file" | grep -F "$datestamp_apache"
+  done
+) | gzip > access.log."$datestamp_int".gz
+
+
+
+
+#
+# bash
+#
+
+log_filename="$( ssh -l root syslog1.ilait.se 'ls -1rtm /root/hugo/access.log* | head -n 1 | xargs basename' | sed 's/\.gz$//' )"
+scp root@syslog1:/root/hugo/"$log_filename".gz .
+
+(
+  echo 'remote_ip,datetime,request_string,status_code,bytes,referer,user_agent'
+  zcat "$log_filename".gz | perl -pe 's#^(\S+)\s+\S+\s+\S+\s+\[([^/]+)/([^/]+)/([^:]+):(.+?)\]\s+("\S+\s+\S+\s+\S+")\s+(\S+)\s+(\S+)\s+("(?:[^"]|\\")*")\s+(".*")#$1,$4-$3-$2 $5,$6,$7,$8,$9,$10#;' | sed -E -e 's/^(([^,]+),([^-]+)-)Jan/\101/' -e 's/^(([^,]+),([^-]+)-)Feb/\102/' -e 's/^(([^,]+),([^-]+)-)Mar/\103/' -e 's/^(([^,]+),([^-]+)-)Apr/\104/' -e 's/^(([^,]+),([^-]+)-)May/\105/' -e 's/^(([^,]+),([^-]+)-)Jun/\106/' -e 's/^(([^,]+),([^-]+)-)Jul/\107/' -e 's/^(([^,]+),([^-]+)-)Aug/\108/' -e 's/^(([^,]+),([^-]+)-)Sep/\109/' -e 's/^(([^,]+),([^-]+)-)Okt/\110/' -e 's/^(([^,]+),([^-]+)-)Nov/\111/' -e 's/^(([^,]+),([^-]+)-)Dec/\112/'
+) > "$log_filename".csv.tmp
+
+#DEBUG: List all rows that failed to be converted to CSV
+grep -Ev --line-buffered '^[0-9a-fA-F.:]+,' "$log_filename".csv.tmp
+#DEBUG
+
+sed '1q' "$log_filename".csv.tmp > "$log_filename".csv
+sed '1d' "$log_filename".csv.tmp | sort --field-separator=, --key=2 >> "$log_filename".csv
+
+zip "$log_filename".csv.zip "$log_filename".csv
+
+rm -f -- ./"$log_filename".csv.tmp ./"$log_filename".csv ./"$log_filename".gz

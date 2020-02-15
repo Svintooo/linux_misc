@@ -1,0 +1,5 @@
+unzip -q file.zip       # Quiet
+unzip -qq file.zip      # Extra quiet
+unzip -d <dir> file.zip
+unzip file.zip zipfile/internal/path/
+unzip -qq file.zip '2018/certificate/*'

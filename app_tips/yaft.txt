@@ -1,0 +1,1 @@
+yaft - nifty framebuffer terminal med 256color support (tyvärr inte truecolor), wallpaper support

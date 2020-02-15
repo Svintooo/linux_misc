@@ -1,0 +1,6 @@
+# Unzip with non-utf8 password
+unzip -P "$( echo "PASSWORD" | iconv -f utf8 -t cp1252 )" file.zip
+
+# File with non-utf8 filename
+mv filename "$(echo filename | iconv -f cp1252 -t utf8)"
+convmv

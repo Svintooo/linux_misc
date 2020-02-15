@@ -1,0 +1,9 @@
+locate [-w/--wholename] <search>  # Match whole path name (default)
+locate -b/--basename              # Match only base name
+locate -r/--regexp <search>
+locate    --regex  <search>       # Extended regexp
+locate -c/--count <search>        # only print number of found files
+locate -A/-all <search>           # only print files that match all search words
+
+recoll  # Graphical tool, also searches file contents
+

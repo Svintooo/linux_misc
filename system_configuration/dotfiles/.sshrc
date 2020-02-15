@@ -1,0 +1,62 @@
+export VIMINIT="let \$MYVIMRC='$SSHHOME/.sshrc.d/.vimrc' | source \$MYVIMRC"
+
+export PATH="${SSHHOME}/.sshrc.d/bin:${PATH}"
+
+if [ -x /usr/bin/dircolors ]; then
+  test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+  LS_COLOR_OPTION="--color=auto"
+fi
+
+if ! type -P exa >/dev/null ; then
+  alias ls='ls -CFNv $LS_COLOR_OPTION --group-directories-first --time-style=long-iso'
+  alias ll='ls -l'
+  alias la='ls -lA'
+  alias l.='ls -la'
+else
+  alias exa='exa --sort=Name --group-directories-first --time-style=long-iso'
+  alias ls='exa'
+  alias ll='exa -g -h -l'
+  alias lt='ll --tree'
+  alias lg='ll --git'
+  alias la='ll -a'
+  alias lat='la --tree'
+  alias l.='ll -a -a --links --inode --blocks --git'
+  alias l.t='ll -a    --links --inode --blocks --git --tree'  # Two '-a' and a '--tree' can't run together
+  alias l.e='ll -a -a --links --inode --blocks --git --extended'
+fi
+
+alias grep="grep --color=auto"
+alias fgrep="fgrep --color=auto"
+alias egrep="egrep --color=auto"
+
+type -P vim >/dev/null && alias viless="$( "$(type -P ls)" -1 /usr/share/vim/vim[0123456789]*/macros/less.sh | sort | tail -n 1 )"
+
+type -P date >/dev/null && function date(){
+  local DATE="$(type -P date)"; [[ "$?" != "0" ]] && exit $?
+  if [ "$#" -eq "0" ]; then "$DATE" +'%F %T %:z'; else "$DATE" "$@"; fi
+}
+
+type -P ip >/dev/null && function ip(){
+  local IP="$(type -P ip)"
+  [[ "$?" != "0" ]] && exit $?
+
+  # https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=5d295bb8e1af491bc3de1d2506cbb2bd6bbd9da1
+  local version="$("$IP" -Version)"
+  version="${version##*ss}"
+  local color=""
+  local brief=""
+  if (( "$version" >= 150831 )); then
+    [ -t 1 ] && local color='-color'
+    local brief="-brief"
+  fi
+
+  if [ "$#" -eq "0" ]; then
+    "$IP" $color $brief addr | sed -E 's/^([^ ]+[ ]*) /\1░/' | column -s '░' -t | sed 's/ //'
+  elif  for i in "${@}"; do [[ "$i" == -br* ]] && break; false; done; then
+    "$IP" $color "$@"        | sed -E 's/^([^ ]+[ ]*) /\1░/' | column -s '░' -t | sed 's/ //'
+  else
+    "$IP" $color "$@"
+    echo "DEBUG: no columnization"
+  fi
+}
+

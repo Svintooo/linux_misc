@@ -1,0 +1,2 @@
+gzip --keep    # No delete files during compression
+gunzip --keep  # No delete file during decompression

@@ -1,0 +1,26 @@
+## How linux apps do name resolution
+1. GNU libc
+ caveat: can only lookup A and AAAA
+ functions:
+  - resolver()       # low level, BSD spec
+  - gethostbyname()  # old, obsolete POSIX spec
+  - getaddrinfo()    # new, modern POSIX spec
+ files:
+  - /etc/nsswitch.conf
+  - /etc/hosts        # through nsswitch.conf
+  - /etc/resolv.conf  # through nsswitch.conf
+  - /etc/hostname     # through nsswitch.conf
+2. Custom
+ reasons:
+  - performance
+  - look up other records than A and AAAA
+
+## how to use them yourself
+# GNU libc
+getent hosts <host-name>
+getent ahosts <host-name>
+
+# Custom: Only DNS servers
+host
+dig
+drill

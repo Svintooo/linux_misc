@@ -1,0 +1,6 @@
+## Download a specific folder from a repo
+# https://stackoverflow.com/questions/7106012/download-a-single-folder-or-directory-from-a-github-repo
+# Master branch: replace /*/master/ with /trunk/
+# Branch 'asdf': replace /*/asdf/ with /branches/asdf/
+#Ex:       https://github.com/helm/charts/tree/master/stable/nginx-ingress/
+svn export https://github.com/helm/charts/trunk/stable/nginx-ingress/templates

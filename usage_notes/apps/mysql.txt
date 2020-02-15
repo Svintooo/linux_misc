@@ -1,0 +1,5 @@
+# Remove squares in output
+mysql -r -s
+
+# Execute from command line
+mysql -e 'QUERY;'

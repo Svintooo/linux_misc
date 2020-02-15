@@ -1,0 +1,5 @@
+tmux new -s NAME
+tmux attach -t NAME
+
+# Inside session
+Ctrl-B :set -g mouse off

@@ -1,0 +1,8 @@
+## convert file.msg to file.eml (plain text) using msgconvert
+https://metacpan.org/release/Email-Outlook-Message
+
+# Install
+cpan -i Email::Outlook::Message
+
+# Use
+msgconvert file.msg

@@ -1,0 +1,10 @@
+# Args
+mpv --no-video 'https://youtu.be/cpraL5w7jKI' --start=03:42:00
+mpv --no-audio ...
+mpv --volume=80  # 80%
+--loop-playlist  # Loop a playlist
+--loop           # Loop a track/file/song
+
+# Keys
+L    # Toggle infinite looping
+9,0  # Change volume

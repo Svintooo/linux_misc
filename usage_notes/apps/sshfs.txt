@@ -1,0 +1,1 @@
+sshfs -o idmap=user -C SSHUSER@SERVER:/REMOTE/PATH /LOCAL/PATH

@@ -1,0 +1,4 @@
+# prevent any signals from reaching a command
+# In other words: It becomes unkillable
+# Nice way of preserving execution after logging out from SSH
+nohup any-command &

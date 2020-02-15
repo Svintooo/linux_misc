@@ -1,0 +1,6 @@
+# Trace:a trafik genom iptables
+modprobe ipt_LOG
+iptables -t raw -A OUTPUT ... -j TRACE
+iptables -t raw -A PREROUTING ... -j TRACE
+tail -f /var/log/kern.log
+... | sed -E -e '/MAC=[^ ]+ +SRC=/!s/SRC=/MAC=  SRC=/' -e '/RES=[^ ]+ +([^ ]+ +){2}URGP=/s/([^ ]+) +([^ ]+ +URGP=)/\1_\2/' -e '/MARK=/!s/$/ MARK=/' -e '/GID=[^ ]+ +MARK=/!s/MARK=/UID= GID= MARK=/' | column -t

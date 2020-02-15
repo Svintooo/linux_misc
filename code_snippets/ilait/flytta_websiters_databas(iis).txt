@@ -1,0 +1,69 @@
+#Rails Console
+
+websites = []  # Lista med website-objekt
+web_db = {}    # Innehåller en massa av: website.fqdn => database.name
+
+# Hjälpkod:
+# - stegar igenom alla webbsidorna en och en, väntar på att användaren ska trycka på enter
+# - skriver ut bashkod som kan köras manuellt för att flytta databasen och byta databasuppgifter på webbsidan
+
+$logged_in_administrator = Administrator.find(2027)
+db_server_name = "mysql12.ilait.se"
+db_server = Server.joins(:domain).where("CONCAT(servers.name, \".\", domains.name) = ?", db_server_name).first
+
+websites.all?{|website| SqlDatabase.where(name: web_db[website.fqdn]).exists? }
+
+websites.each do |website|
+  puts "#### #{website.fqdn} ####"
+  database = SqlDatabase.find_by(name: web_db[website.fqdn])
+  p database
+
+  puts "# DB CREATE @new_server"
+  puts "cat <<EOF | ssh -l root '#{db_server.fqdn}' 'mysql'"
+  puts "  CREATE USER '#{ database.user.name }'@'%' IDENTIFIED BY '#{ database.user.password }';" 
+  puts "  GRANT USAGE ON * . * TO '#{ database.user.name }'@'%' IDENTIFIED BY '#{ database.user.password }' WITH MAX_QUERIES_PER_HOUR #{ database.sql_database_plan.mysql_max_queries_per_hour } MAX_CONNECTIONS_PER_HOUR #{ database.sql_database_plan.mysql_max_connections_per_hour } MAX_UPDATES_PER_HOUR #{ database.sql_database_plan.mysql_max_updates_per_hour } MAX_USER_CONNECTIONS #{ database.sql_database_plan.mysql_max_user_connections };" 
+  puts "  CREATE DATABASE IF NOT EXISTS #{ database.name };" 
+  puts "  GRANT SELECT , INSERT , UPDATE , DELETE , EXECUTE , CREATE , DROP , REFERENCES , INDEX , ALTER , CREATE TEMPORARY TABLES , CREATE VIEW , SHOW VIEW , CREATE ROUTINE , ALTER ROUTINE , LOCK TABLES ON #{ database.name } . * TO '#{ database.user.name }'@'%';" 
+  puts "EOF"
+  puts "#"
+
+  puts "# DB COPY to new_server"
+  puts "("
+  puts "  ssh -l root '#{database.server.fqdn}' 'mysqldump --opt --routines #{database.name}' > '#{database.name}.sql'"
+  puts "  cat '#{database.name}.sql' | ssh -l root '#{db_server.fqdn}' \"mysql -u #{database.user.name} -p'#{database.user.password}' #{database.name}\""
+  puts "  rm -f '#{database.name}.sql'"
+  puts ")"
+  puts "#"
+
+  puts "# DB LOCK @old_server"
+  puts "cat <<EOF | ssh -l root '#{database.server.fqdn}' 'mysql'"
+  puts "  REVOKE ALL PRIVILEGES, GRANT OPTION FROM '#{ database.user.name }'@'%';"
+  puts "  DROP USER '#{ database.user.name }'@'%';"
+  puts "EOF"
+  puts "#"
+
+  puts "# WEBSITE DB CHANGE"
+  ftp_user = website.user.name
+  ftp_pass = website.user.password
+  ftp_server = website.user.server.fqdn
+  puts "("
+  puts "  ncftpget -u '#{ftp_user}' -p '#{ftp_pass}' -V '#{ftp_server}' ./ Content/web.config"
+  puts "  cp -p web.config web.config.bak"
+  puts "  sed -Ei -e '/connectionString=.*#{database.name}/s/Data Source=[^;]+;/Data Source=#{db_server.fqdn};/' web.config"
+  puts "  colordiff -urp web.config.bak web.config"
+  puts ")"
+  puts "ncftpput -u '#{ftp_user}' -p '#{ftp_pass}' -V '#{ftp_server}' Content/ web.config web.config.bak"
+  puts "rm -f web.config web.config.bak"
+  puts "#"
+
+  puts "# DB remember to delete @old_server"
+  puts "echo '#{database.name} @#{database.server.fqdn}' >> db_remove_list.txt"
+  puts "#"
+
+  print "# Press enter to continue... "
+  gets
+  database.server_id = db_server.id
+  database.save!
+
+  puts
+end.count

@@ -1,0 +1,143 @@
+## DE
+LXQt
+
+# Detta gör så svenskt tangentbord används vid login
+# Conf-filer ändras av detta så det är en permafix
+localectl set-x11-keymap se
+#installera även fonter, annars syns ingen text
+
+# slock
+slock
+xdg-utils-slock från AUR för att få slock att fungera
+
+
+## Login Manager
+sddm
+systemctl enable sddm
+#en användare måste skapas först innan sddm kan användas
+#installera även fonter, annars syns ingen text
+
+# User Icon
+#Spara en bild i ~ /.face.icon med läsrättigheter till SDDM
+#Ovan verkar inte fungera. Lägg (symlänka) i stället en bild i /usr/share/sddm/faces/
+#Inget fungerar. kanske bilden måste vara ett specifikt format.
+
+
+## Sound
+Gör dig medlem i gruppen: audio
+Installera pulseaudio och extra/pavucontrol
+Kör pavucontrol och mecka tills du får ljud.
+
+
+## DNS
+Denna setup kör DE LXQt tillsammans med network daemon connman.
+connman kör en egen local DNS-server (sudo lsof -i :53), och genererar en egen /etc/resolv.conf.
+Detta ignorerar /etc/resolvconf.conf (resolvconf -u).
+
+# Stäng av local DNS-server
+]$ sudo vim /etc/systemd/system/connman.service.d/disable_dns_proxy.conf
+[Service]
+ExecStart=
+ExecStart=/usr/bin/connmand -n --nodnsproxy
+]$ sudo systemctl daemon-reload
+]$ sudo systemctl cat connman
+]$ sudo systemctl restart connman
+
+# använd resolvconf.conf (hindra connman från att editera filen)
+]$ sudo vim /etc/resolvconf.conf
+name_servers="127.0.0.1 ::1"
+]$ sudo resolvconf -u  # This generates a new resolv.conf
+]$ sudo chattr +i /etc/resolv.conf
+
+# Använd en egenkonfad local dns-server (cachar dns-uppslagningar, m.m.)
+]$ sudo pacman -S dnsmasq --needed
+]$ sudo vim /etc/dnsmasq.conf
+domain-needed
+bogus-priv
+no-resolv
+server=82.99.18.43
+server=82.99.18.44
+address=/.k8s/192.168.15.4  # alla uppslagningar mot *.k8s ger IP 192.168.15.4
+listen-address=127.0.0.1
+listen-address=::1
+no-negcache
+]$ dnsmasq --test
+]$ sudo systemctl enable dnsmasq
+]$ sudo systemctl start dnsmasq
+
+
+## CPU Performance
+# Verifiera
+cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
+# Ändra default 'powersave' till 'performance'
+pacman -S cpupower
+cpupower frequency-set -g performance
+
+
+## Git
+# Confa
+git config --global user.name "Hugo Ankarloo"
+git config --global user.email hugo@ilait.se
+git config --global log.date iso
+git config --global color.ui auto
+git config --global alias.wdiff "diff --color-words --word-diff-regex='[A-Za-z_]+|[0-9]+([.][0-9]+)?|[0-9]+(:[0-9]+)+|[^[:space:]]'"
+
+
+## Misc
+
+# disable ctrl+alt+del in tty (no desktop)
+#OBS: Har itne verifierat att detta fungerar
+sudo systemctl mask ctrl-alt-del.target
+sudo systemctl daemon-reload
+
+# ssh-agent
+cp ssh-agent.service /etc/systemd/user/
+echo 'SSH_AUTH_SOCK DEFAULT="${XDG_RUNTIME_DIR}/ssh-agent.socket"' >> /etc/skel/.pam_environment
+#kontrollera att varje användare har den aktiverad: systemctl --user status ssh-agent
+#LXQt: Session Settings -> Environment (Advanced): SSH_ASKPASS lxqt-openssh-askpass
+#LXQt: Session Settings -> Autostart: SSH Key: ssh-add ~/.ssh/your@key
+
+# sudo
+tillåt gruppen wheel
+inkludera env EDITOR och VISUAL
+
+# AUR
+aura verkar fungera bra
+
+# USB automount till /media
+LXQt: Öppna PCManFM-Qt och gå in i settings. Där kan man ställa in automount.
+
+# Local apps och bin
+#TIP: Fixa detta inuti /etc/skel/ innan användare skapas.
+#skapa lokalt mapparna ~/apps/ och ~/bin/
+#Skapa en .profile med: export PATH="${HOME}/bin:${PATH}"
+#lägg till i .bash_profile så den läser in .profile
+#detta gör att inställningen lättare behålls mellan olika shells.
+
+# xorsearch
+https://blog.didierstevens.com/programs/xorsearch/
+xorsearch finns i AUR
+xorstring måste installeras manuellt
+
+# firefox
+#Installera firefox med pacman för att få alla dependencies.
+#Ladda sedan ner filefox manuellt till ~/apps/firefox/
+#Skapa symlänk från ~/apps/firefox/firefox-bin till ~/bin/firefox . Nu har du rätt firefox i PATH.
+#Kopiera /usr/share/applications/firefox.desktop till ~/.local/share/applications/ och modda den så den kör den nya firefox i stället. Nu ska rätt firefox startas från startmenyn i LXQt.
+#about:config
+#  browser.search.suggest.enabled false
+#  browser.urlbar.decodeURLsOnCopy true
+#  browser.urlbar.doubleClickSelectsAll false
+#  browser.urlbar.trimURLs false
+#  dom.event.clipboardevents.enabled false
+#  dom.event.contextmenu.enabled false
+
+
+# mkinitcpio missing firmware
+#Om du stör dig att mkinitcpio klagar på dessa, bara sök efter modulnamnen i AUR och installera skiten.
+#Kör sedan om mkinitcpio: mkinitcpio -p linux
+
+# ksm
+en grej som kombinerar minne i RAM (eller vad man nu kallar det).
+kan aktiveras i proc (någonstans).
+kolla upp skiten, vetja.

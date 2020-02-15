@@ -1,0 +1,38 @@
+# Ta sista active records
+Domain.order(id: :desc).offset(9).limit(2)  # för den 9:de och 10:de sista
+
+# Debug printouts
+p
+pp
+y
+
+# Misc
+Object.tap och Object.yield_self
+Hash[ a_hash.sort_by{|key,_|key} ];nil  # New Hash sorted by key.
+a_hash.filter{|key,value| ... }         # New Hash with filtered out keys.
+
+# Force reconnect database
+ActiveRecord::Base.connection.reconnect!
+
+# Disable screen debug output
+old_logger = ActiveRecord::Base.logger
+ActiveRecord::Base.logger = Object.new.tap{|o| def o.method_missing(m, *args, &block); end }  # dummy-metod så inte scrubber-koden krashar
+
+# Start rails console
+rails c
+rails c -s  # ROLLBACK: No db changes saved
+
+# Rails migrations
+rails db:migrate
+rails db:rollback STEP=1
+
+# Rails uppdatera kod i production
+utv# git stash
+utv# git clean -df
+utv# git secpublish production
+partner@backend-tools1-1:/home/panel$ rails db:migrate RAILS_ENV="production"
+root@backend-tools1-1# systemctl restart resque.target
+partner@partner1-1:/home/panel$ RAILS_ENV=production rails assets:precompile --trace
+partner@partner1-1:/home/panel$ bin/daemon replace
+partner@partner1-1:/home/panel$ tail -F log/unicorn.log  # Vänta på: INFO -- : master complete
+

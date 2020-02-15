@@ -1,0 +1,17 @@
+# google - force .com
+https://www.google.com/ncr
+(NCR = no country redirect)
+
+# firefox - remove pocket
+about:config
+extensions.pocket.enabled => false
+
+# firefox - show http in url bar
+about:config
+browser.urlbar.trimURL => false
+
+# firefox - protect against ctrl+q
+under linux finns ingen perfekt fix. firefox är lite buggig här.
+- about:config sök på quit och säg åt den att alltid varna.
+- gör en global ctrl+q hotkey i din DE så firefox aldrig får den.
+

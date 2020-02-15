@@ -1,0 +1,5 @@
+# List all processes
+ps aux
+
+# List all processes in a tree
+ps auxf

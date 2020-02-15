@@ -1,0 +1,23 @@
+curl --connect-timeout <seconds>
+curl --insecure
+
+curl -X POST -H "Content-Type: application/json" -d '{"json":true}' https://api.asdf.com/
+curl -X POST -H "Content-Type: application/json" -d @file.json https://api.asdf.com/
+
+curl --user "EMAIL:PASWORD" "imaps://SERVER" -X CAPABILITY
+curl --user "EMAIL:PASWORD" "imaps://SERVER" -X CAPABILITY --login-options AUTH=PLAIN
+
+#https://daniel.haxx.se/blog/wp-content/uploads/2020/01/sticker-cheat-sheet.png
+hide process    verbose               extra info          output            timeout
+ -s              -v                    -w "format"         -O                -m <seconds>
+                 --trace-ascii <file>                      -o <file>
+POST            POST encoded          multipart formpost  PUT               HEAD (ers to)
+ -d "string"     --data-urlencode      -F name=value       -T <file>         -I
+ -d @file        "[name]=val"          -F name=@file                         -i
+custom method   read cookiejar        write cookiejar     send cookies      user-agent
+ -Z "METHOD"     -b <file>             -c <file>           -b "c=1; d=2"     -A "string"
+proxy           add/remove headers    custom address      smaller data      insecure HTTPS
+ -x <host:port>  -H "name: value"      --resolve           --compressed      -k
+                 -H "name:"            <host:port:addr>
+Basic auth      follow redirects      parallel            generate code     list options
+ -u user:passwd  -L                    -Z                  --libcurl <file>  --help

@@ -1,0 +1,3 @@
+grepcidr  # Greppar i lista med IP-adresser efter ett CIDR-block.
+ipcalc    # Tar emot alla möjliga varianter ip IP-strängar. Visar massa info.
+prips     # Genererar IP-adresser från CIDR-block.

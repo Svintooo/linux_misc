@@ -1,0 +1,2 @@
+# Add paths to PATH
+echo "PATH=$PATH:/new/path" > /etc/profile.d/new-path.sh

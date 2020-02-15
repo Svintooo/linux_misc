@@ -1,0 +1,13 @@
+diff -urp <file> <file>
+diff -urp -U99999 <file> <file>  # Display whole file
+colordiff
+
+# Only show changed lines
+diff <file> <file> | sed -E '/^[><]/!d'
+diff -u <file> <file> | sed -E -e '1,2d' -e '/^[+-]/!d'
+#color
+escseq='('$'\e''([@A-Z\[\\^_]|\])[0-9:;<=>?]*[-!"#$%&()*,./'"'"']*([@A-Z\[\\^_`a-z{|}~]|\]))'
+colordiff -u <file> <file> | sed -E -e '1,2d' -e "/^${escseq}[-+]/"'!d'
+colordiff -u <file> <file> | sed -E -e '1,2d' -e "/^${escseq}[-+@]/"'!d' | diff-so-fancy
+
+icdiff -U0 --show-all-spaces <file> <file> | sed -E "/^${escsec}---/d"

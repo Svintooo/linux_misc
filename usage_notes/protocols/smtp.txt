@@ -1,0 +1,22 @@
+## base64-encode användarnamn och lösenord
+echo -n 'username' | base64 -w 0
+perl -MMIME::Base64 -e 'print encode_base64("username");'
+# OBS! Funkar inte! Skräp kommer med.
+base64 <<< 'username'
+cat <<< 'username' | base64
+
+
+## Example SMTP session
+telnet gmail-smtp-in.l.google.com 25
+EHLO smtp1-2.ilait.se
+MAIL FROM:<nicke@uppsalarekondservice.se>
+RCPT TO:<hugo@ilait.biz>
+DATA
+From: "nicke@uppsalarekondservice.se" <nicke@uppsalarekondservice.se>
+Date: Fri, 8 Mar 2019 20:27:52 +0100
+Subject: Testmail
+To: "hugo@ilait.biz" <hugo@ilait.biz>
+
+Detta aer ett testmail fraan migsjaelv.
+.
+

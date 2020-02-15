@@ -1,0 +1,20 @@
+# Online cheat sheets
+curl https://cheat.sh
+curl https://cht.sh
+
+# Help
+curl https://cheat.sh/:help
+
+# Learn a programming language
+curl https://cheat.sh/rust/:learn
+curl https://cheat.sh/js/:learn
+
+
+# Example bash wrapper function
+how_in() {
+  where="$1"; shift
+  IFS=+ curl "https://cht\.sh/$where/ $*"
+}
+how_in bash get length of array
+how_in awk print last field
+how_in sed remove several lines

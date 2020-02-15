@@ -1,0 +1,11 @@
+# download the best audio in m4a format:
+youtube-dl -f 'bestaudio[ext=m4a]' 'http://youtu.be/hTvJoYnpeRQ'
+
+# download best audio and ONLY audio to best format
+youtube-dl -f 'bestaudio' --extract-audio 'http://youtu.be/hTvJoYnpeRQ'
+
+# downlaod best audio to specific format
+youtube-dl -f 'bestaudio' --extract-audio --audio-format mp3 'http://youtu.be/hTvJoYnpeRQ
+
+# download just best of audio and video
+youtube-dl -f 'bestaudio/best' 'http://youtu.be/hTvJoYnpeRQ'
