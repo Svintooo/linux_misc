@@ -1,3 +1,4 @@
 # Converts text from stdin and sends to stdout
 ... | tr '[:upper:]' '[:lower:]'  # upcase to lowcase
 ... | tr --delete 'asdf1234'      # delete characters
+... | tr -d '\n'                  # remove newlines

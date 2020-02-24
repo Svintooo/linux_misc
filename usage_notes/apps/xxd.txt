@@ -1,0 +1,2 @@
+# Hex-file to bin-file
+xxd -r -p dil.hex file.bin

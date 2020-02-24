@@ -5,8 +5,23 @@ sudo dmidecode -t 2
 smartctl -i /dev/sda
 
 # Misc
-lspci
+lspci -v
 sudo dmidecode | less
+lshw      # pacman -S lshw
+
+# Graphics
+glxinfo -B
+# nvidia-lbob:
+nvidia-smi       # console-info
+nvidia-settings  # gui-info
+
+# Sensors
+# pacman -S lm_sensors
+sudo sensors-detect --auto
+sensors
+# nvidia-blob:
+nvidia-smi       # console-info
+nvidia-settings  # gui-info
 
 
 # CPU/RAM/Disk info helper functions
