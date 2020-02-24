@@ -11,3 +11,5 @@ awk '{print $(NF-1)}'  # Print the next to last field
 awk 'NR==1{print $0}'  # Print only the first row
 awk 'NR==3{print $0}'  # Print only the 3:rd row
 awk 'END{print $0}'    # Print only the last row
+# Print only the n:th row, counting backwards
+awk 'END{print A[(NR-n+1)%n]} {A[NR%n]=$0}' n=2

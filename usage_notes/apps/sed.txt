@@ -1,6 +1,53 @@
+sed 's/^.*asdf/#\0/'
 sed 's/^.*asdf/#&/'
 
 sed -s  # Hantera varje fil för sig, inte alla som en enda lång ström
 
 # Första raden från en fil blir första raden i alla filer
 for i in ./*; do sed -i "1i$(sed 1q A_FILE)" "$i"; done
+
+## Zap: clear pattern space
+# https://www.gnu.org/software/sed/manual/sed.html#index-Emptying-pattern-space-1
+# Båda nedan gör samma sak
+# Men s kan misslyckas om ogiltiga tecken existerar
+'s/.*//'
+'z'
+
+## DEBUG print pattern space
+# Skriver ut pattern space och alla specialtecken är excape:ade
+# newlines skrivs ut som \n som exempel
+'l'
+
+
+## INI-liknande filer, lägg till data i en specifik sektion
+SECTION=Asdf  # Will match: ^[Asdf]
+DATA="key=val"
+
+# Lägg till DATA i början av sektionen
+sed -E file -e "/^\[${SECTION}\]/a${DATA}"
+
+# Lägg till DATA i slutet av sektionen
+sed -E file -e "/^\[${SECTION}\]/,/^\[/"'{H;$!d}' -e 'x;/./{s,^\n,,;'"s,^(\[[^\[]+\])((\n*[^\n\[][^\n]*)*)(\n+)?,\1\2\n${DATA}\4,"';p;$Q;z};x'
+#-e "/^\[${SECTION}\]/,/^\[/"'{ ... }'
+#   Matcha alla rader i sektionen.
+#                            '{H;$!d}'
+#   Append:a raden till Hold Space.
+#   Radera raden (nästa rad läses in direkt, instruktionerna börjar om).
+#   Radera inte om vi är på sista raden. Annars så kommer sed avsluta
+#   och allt i Hold Space kommer ignoreras. Denna jobbar tillsammans med
+#   en sista-raden-check längre ner i skriptet.
+#-e 'x;/./{ ... };x
+#   Om Hold Space inte är tom, kör instruktionerna mellan { och }.
+#         {s,^\n,,;
+#   Append till Hold Space (H) lägger alltid till en \n fastän Hold Space
+#   är tom, så vi behöver ta bort den första \n här.
+#          s,^(\[[^\[]+\])((\n*[^\n\[][^\n]*)*)(\n+)?,\1\2\n${DATA}\4,
+#   Den magiska koden som lägger till DATA på rätt ställe.
+#   Ser till så DATA läggs in i slutet av sektionen, men innan eventuella
+#   tomma rader i slutet.
+#         ;p;$Q;z}
+#   Print:a den modifierade texten.
+#   Om vi är på sista raden, avsluta utan att print:a något mer. Denna
+#   jobbar med en sista-raden-check längre up i skriptet.
+#   Radera all text i minnet. Detta gör att Hold Space kommer vara tom.
+
