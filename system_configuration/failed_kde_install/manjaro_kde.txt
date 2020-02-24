@@ -1,0 +1,94 @@
+# arch-linux get started guide
+
+
+### Disable Hibernate/Suspend ###
+# 2020-02-17: https://wiki.archlinux.org/index.php/Polkit#Disable_suspend_and_hibernate
+sudo tee <<EOF >/dev/null /etc/polkit-1/rules.d/10-disable-suspend.rules
+polkit.addRule(function(action, subject) {
+    if (action.id == "org.freedesktop.login1.suspend" ||
+        action.id == "org.freedesktop.login1.suspend-multiple-sessions" ||
+        action.id == "org.freedesktop.login1.hibernate" ||
+        action.id == "org.freedesktop.login1.hibernate-multiple-sessions")
+    {
+        return polkit.Result.NO;
+    }
+});
+EOF
+# https://bbs.archlinux.org/viewtopic.php?id=175599
+sudo systemctl mask hibernate.target
+sudo systemctl mask suspend.target
+
+
+### sddm ###
+# Set simple mouse pointer
+# Availabe themes can be found in /usr/share/icons/
+# File:
+/etc/sddm.conf.d/kde_settings.conf
+# Content:
+[Theme]
+CursorTheme=KDE_Classic
+
+
+### Folders ###
+mkdir -p ~/apps ~/bin ~/repos ~/tmp ~/pkgbuild
+
+
+### wget ###
+sudo pacman -S wget --needed
+
+
+### yay (pacman wrapper) ###
+cd ~/pkgbuild
+wget https://aur.archlinux.org/cgit/aur.git/snapshot/yay-bin.tar.gz
+tar xzf yay-bin.tar.gz
+cd yay-bin/
+makepkg --clean --cleanbuild --install --syncdeps
+
+
+### vim ###
+yay -S vim
+## Color schemes
+yay -S vim-colorsamplerpack vim-jellybeans vim-molokai vim-kolor vim-badwolf-git vim-tomorrow-theme-git nord-vim vim-apprentice vim-colorscheme-unsuck-flat-git
+vim ~/.vimrc  # colorscheme <name>  # Recommendation: nord
+# Set for instance (inside vim)
+:colorscheme <name>
+## Extra
+yay -S vim-iptables vim-systemd vim-pacmanlog vim-rust-git  # Highlights
+yay -S vim-better-whitespace
+
+
+### vimpager ###
+# vimcat
+yay -S vimpager
+
+
+### IMWheel ###
+# Faster wheel scrolling in firefox and more
+# https://wiki.archlinux.org/index.php/Imwheel
+yay -S imwheel
+
+
+### geany ###
+install geany
+isntall geany-plugins, if packet is available
+# themes
+Recommend: Sleepy Pastel
+Path: ~/.config/geany/colorschemes/
+https://www.geany.org/download/themes/
+https://github.com/geany/geany-themes/labels/new-theme
+
+
+### misc ###
+yay -S vimiv    # Image Viewer with vim like controls
+yay -S ripgrep
+
+
+
+
+
+### TODO ###
+aur/sshrc
+
+# R.A.T. mouse linux fix
+# https://github.com/rkruk/R.A.T.-Cyborg-Mouse-on-Linux
+lshw | grep -E 'R.A.T.7' -B 2 -A 7

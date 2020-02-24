@@ -1,0 +1,62 @@
+fixa repo för alla filer som delas mellan datorer
+  dotfiles
+  os configs & install guides
+  kodade berktyg
+  bin
+innehåll
+  dotfiles
+  conf-filer för systemet (ex: sshd_conf)
+  guider för hur man använder program
+  guider för hur man använder misc (hemsidor, m.m.)
+filstruktur
+  code snippets
+  usage guides
+
+
+
+
+
+Vilka filrättigheter hindrar mig från att ta bort
+  /home/svintoo/.cache/yay/mattermost/src/pkg/mod/github.com/pelletier/go-toml@v1.4.0/lexer_test.go
+  /home/svintoo/.cache/yay/mattermost/
+
+fixa alla graphics-tearing i konsoller i X.
+
+hitta en vettig bakgrundsbild
+  applicera även för login-managern
+
+sno configs från jobb-datorn
+  PS1
+  sshrc
+
+default-terminal
+  Få bort close-knappar från tabbarna
+
+Fixa så Tab-tryck i geany ger 2 whitespaces
+
+Installera sublime text
+Testa VSCode
+
+Testa Ändra default-text-color i qterminal
+  testa samma gröna som i default-terminal
+
+Ändra scroll i less/vim/viless
+  scrolla bara halva skrämen med PgDwn, inte hela.
+  vim: mappa PgDwn till Ctrl-D och PgUp till Ctrl-U
+  less: filerna ~/.lesskey och ~/.less, även här Ctrl-D och Ctrl-U.
+
+DE
+  snabba upp (stäng av) animeringar
+    Alt-F2
+    Alt-Tab
+
+Firefox
+  Installera egen i ~/apps/
+
+Hårdvarufläkt.
+  Tror inte den behövs. Och den låter.
+  Ta bort den.
+
+Fixa repository över alla text-filer jag har skapat
+  ongoing
+
