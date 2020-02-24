@@ -4,3 +4,6 @@ tar xf <file>   #Extract files
 
 # Ignores the root folder in file and extracts everything else to path
 tar xf <file> -C <path> --strip-components=1
+
+# Pipe:a tar-stream
+tar c --to-stdout | ...
