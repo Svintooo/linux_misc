@@ -129,6 +129,7 @@ function punyencode(){
 }
 
 # Display not only changed rows, but also what characters on each row that has changed.
+# pacman -S diff-so-fancy --needed
 function cdiff() {
   diff -u "$@" \
   | sed -E -e '1,2d' -e '/^[-+@]/!d' \
