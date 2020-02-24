@@ -1,0 +1,2 @@
+Fix for MadCatz R.A.T. 7/9 mouse
+Place file in /etc/X11/xorg.conf.d/

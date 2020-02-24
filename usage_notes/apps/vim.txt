@@ -4,7 +4,8 @@ set mouse=
 :goto <char-offset>
 
 # Set highlighting syntax for the file (useful if file doesn't have a filename extension)
-vim <file> -s <(echo ":set syntax=json")
+vim <file> -c "set syntax=json"
+vim <file> -c "setf json"
 
 # Pilar
 ←↓↑→ = HJKL

@@ -45,7 +45,15 @@ alias sudo='sudo '
 
 # viless (vim pager)
 # See also: pacman -Si vimpager
-type -P vim >/dev/null && alias viless="/usr/share/vim/vim[0123456789]*/macros/less.sh"
+#type -P vim >/dev/null && alias viless="$(
+#  ls="$(type -P ls)"
+#  "$ls" -1 /usr/share/vim/vim[0123456789]*/macros/less.sh | sort | tail -n1
+#)"
+# See: vim -c ':help $VIMRUNTIME' -c '/VIMRUNTIME='
+type -P vim >/dev/null && alias viless="$(
+  vimruntime="$(vim -e -T dumb --cmd 'exe "set t_cm=\<C-M>"|echo $VIMRUNTIME|quit' | tr -d '\015' )"
+  echo "${vimruntime}/macros/less.sh"
+)"
 
 # date: default to iso8601
 type -P date >/dev/null && function date(){
