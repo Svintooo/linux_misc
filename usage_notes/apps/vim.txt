@@ -18,7 +18,6 @@ vim <file> -c "setf json"
 ctrl-w + piltangenter
 ctrl+w + w  # Toggle
 
-# Radera till nästa tom rad
-d}
-# Radera till slutet på filen
-dG
+D   # Delete to end-of-line
+d}  # Delete to next empty line
+dG  # Delete to end-of-file
