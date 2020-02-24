@@ -1,0 +1,4 @@
+# instead of viless
+# ALSO: cat with vim colors!!!
+vimcat    # cat with vim colors
+vimpager  # less

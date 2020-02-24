@@ -1,0 +1,1 @@
+command that can take from stdin and save it to clipboard
