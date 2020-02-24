@@ -1,0 +1,6 @@
+## Helpful Commands
+xrandr --query
+xrandr --verbose
+nvidia-xconfig --query-gpu-info
+nvidia-smi       # nvidia blob monitoring information
+nvidia-settings  # nvidia blob gui
