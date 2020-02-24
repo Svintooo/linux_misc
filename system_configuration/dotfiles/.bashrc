@@ -151,7 +151,20 @@ function csv_strip(){
       return 1
     fi
   done
-  ruby -r csv -e "CSV.parse(ARGF.read,col_sep:'${sep}'){|o| puts o.collect{|s|s.strip}.to_csv(col_sep:'${sep}')}" "${file[@]}"
+  #ruby -r csv -e "CSV.parse(ARGF.read,col_sep:'${sep}'){|o| puts o.collect{|s|s.strip}.to_csv(col_sep:'${sep}')}" "${file[@]}"
+  local python_code="
+    import csv,fileinput,sys;
+    csv_reader = csv.reader(fileinput.input(),delimiter='${sep}')
+    csv_writer = csv.writer(sys.stdout, delimiter='${sep}')
+
+    for row in csv_reader:
+      row_stripped = []
+      for col in row:
+        row_stripped.append(col.strip())
+      csv_writer.writerow(row_stripped)
+  "
+  python_code="$( sed -E <<<"$python_code" 's/^    //' )"
+  python -Ibbs -c "$python_code" "${file[@]}"
 }
 
 type -P yay >/dev/null && function yay(){
