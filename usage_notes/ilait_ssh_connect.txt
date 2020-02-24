@@ -1,0 +1,19 @@
+# Method 1
+ssh-agent -a "/tmp/$USER.agent"
+ssh-add ~/.ssh/hugo@ilait.se
+ssh -A -l hugo gw-gbg.ilait.se -L 22001:10.46.1.157:22
+ssh -A -l hugo localhost -p 22001 -L 25900:localhost:5900
+x11vnc -ncache -forever -localhost -display :0
+
+vncviewer -encodings "copyrect tight zrle hextile" localhost:25900
+vncviewer -PreferredEncoding=ZRLE localhost:25900
+
+
+# Method 2
+ssh-agent -a "/tmp/$USER.agent"
+ssh-add ~/.ssh/hugo@ilait.se
+ssh -A -J hugo@gw-gbg.ilait.se hugo@10.46.1.157 -L 25900:localhost:5900
+x11vnc -ncache -forever -localhost -display :0
+
+vncviewer -PreferredEncoding=ZRLE localhost:25900
+
