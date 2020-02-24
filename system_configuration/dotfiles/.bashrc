@@ -90,12 +90,15 @@ type -P ip >/dev/null && function ip(){
     brief=""
   fi
 
+  # used to align output from: ip -brief
+  local alignment_code="sed -E 's/^([^ ]+[ ]*) /\1░/' | column -t -s '░' -o ' '"
+
   if (( $# == 0 )); then
     # No args: run a default command + output alignment fix
-    "$IP" $color $brief addr | sed -E 's/^([^ ]+[ ]*) /\1░/' | column -t -s '░' -o ' '
+    "$IP" $color $brief addr | eval "$alignment_code" 
   elif for arg in "${@}"; do [[ "$arg" == -br* ]] && break; false; done; then
     # Args contain -brief: output alignment fix
-    "$IP" $color "$@"        | sed -E 's/^([^ ]+[ ]*) /\1░/' | column -t -s '░' -o ' '
+    "$IP" $color "$@"        | eval "$alignment_code"
   else
     # Args exists: Just add -color arg
     "$IP" $color "$@"
