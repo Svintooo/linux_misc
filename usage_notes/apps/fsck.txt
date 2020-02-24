@@ -1,0 +1,12 @@
+# Check available fsck filesystem support
+fsck.  # Press tab tab
+
+# Unmount before running
+umount /path/to/mount/dir
+
+# Run simple check, asks for repair
+fsck /dev/<device>
+
+# Repair everything
+fsck -y /dev/<device>
+
