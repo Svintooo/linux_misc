@@ -1,0 +1,73 @@
+## Install Guide for Server Host ##
+
+loadkeys sv-latin1
+
+timedatectl set-ntp true
+timedatectl set-timezone Europe/Stockholm
+timedatectl status
+
+hostname serverhost
+hostname
+
+mount -o remount,rw /run/archiso/bootmnt
+
+# Ta bort eventuell befintlig RAID
+#mdadm --stop /dev/md?
+#mdadm --zero-superblock /dev/sda3
+#mdadm --zero-superblock /dev/sdb3
+
+# Partition1: type:BIOS Boot,  label:grub, size:1MB
+# Partition2: type:Linux swap, label:swap, size:8GB
+# Partition3: type:Linux RAID, label:raid, size:allt förutom de sista 100MB
+cgdisk /dev/sda
+cgdisk /dev/sdb
+
+mdadm --create --verbose --level=1 --metadata=1.2 --chunk=64 --raid-devices=2 --name=system /dev/md0 /dev/sda3 /dev/sdb3
+cat /proc/mdstat
+mdadm --detail /dev/md0
+
+mkfs.ext4 -v -L root -m 1 -b 4096 -E stride=16,stripe-width=16 /dev/md0
+mount /dev/md0 /mnt
+
+mkswap --label swap /dev/sda2
+mkswap --label swap /dev/sdb2
+swapon -L swap
+
+# modifiera /etc/pacman.d/mirrorlist så alla svenska servrar är överst.
+sed -i -r '/^#Color$/s/^#//'          /etc/pacman.conf  # Aktivera color
+sed -i -r '/^#\[multilib\]/,+1s/^#//' /etc/pacman.conf  # Aktivera multilib
+pacman -Sy
+pacstrap /mnt base base-devel linux-lts grub fuse dosfstools vim zip unzip unrar p7zip gptfdisk pkgfile abs bash-completion vim-colorsamplerpack
+
+mdadm --detail --scan >> /mnt/etc/mdadm.conf
+echo "MAILADDR root"  >> /mnt/etc/mdadm.conf
+genfstab -p -L /mnt >> /mnt/etc/fstab
+:> /mnt/root/install_guide.txt
+mount --rbind /root/install_guide.txt /mnt/root/install_guide.txt
+cp /mnt/etc/skel/.bash_profile /mnt/root/
+cp /root/bashrc /mnt/root/.bashrc
+chmod 644 /mnt/root/.bashrc
+arch-chroot /mnt bash
+
+hostname > /etc/hostname
+ln -sf /usr/share/zoneinfo/Europe/Stockholm /etc/localtime
+sed -i -r '/^#Color$/s/^#//'          /etc/pacman.conf  # Aktivera color
+sed -i -r '/^#\[multilib\]/,+1s/^#//' /etc/pacman.conf  # Aktivera multilib
+pkgfile --update
+pacman -R linux  # Ta bort standard-kerneln eftersom vi ska använda lts-kerneln i stället.
+
+sed -i -r '/^#(en_DK|en_US|ja_JP|sv_SE).UTF-8/s/^#//' /etc/locale.gen
+locale-gen
+echo 'LANG="en_DK.UTF-8"' > /etc/locale.conf
+echo 'LC_COLLATE="C"'    >> /etc/locale.conf
+echo 'KEYMAP="sv-latin1"' > /etc/vconsole.conf
+
+sed -i -r '/HOOKS=/s/(block) (filesystems)/\1 mdadm_udev \2/' /etc/mkinitcpio.conf
+mkinitcpio -p linux-lts
+
+passwd
+
+grub-install --recheck /dev/sda
+grub-install --recheck /dev/sdb
+grub-mkconfig -o /boot/grub/grub.cfg
+

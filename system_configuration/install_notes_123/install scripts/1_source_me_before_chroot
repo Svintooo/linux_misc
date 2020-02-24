@@ -1,0 +1,47 @@
+#
+# How to access these files during install
+# 1. Mount them from an USB stick
+# 2. Mount using sshfs:
+#    mkdir ~/media
+#    sshfs hugo@IPADDRESS:/media ~/media
+#
+
+## Bootstrap
+src="$(dirname "$_")"
+[ ! -z "$BASH_SOURCE" ] && src="$(dirname "$BASH_SOURCE")"
+mkdir -p ~/tmp
+rsync -r "$src/" ~/tmp/
+chmod 755 ~/tmp/*.sh
+unset src
+
+
+## Set swedish keyboard layout
+loadkeys sv-latin1
+
+
+## Copy bin directory
+if [ -d ~/tmp/bin ]; then
+  mkdir -p ~/bin
+  rsync -r ~/tmp/bin/ ~/bin/
+  chmod 755 ~/bin/*
+fi
+
+
+## Alias
+if [ ! -x ~/bin/exa ]; then
+  alias ls='command ls -CF   --color=auto --group-directories-first --time-style=long-iso'
+  alias ll='command ls -CFl  --color=auto --group-directories-first --time-style=long-iso'
+  alias la='command ls -CFlA --color=auto --group-directories-first --time-style=long-iso'
+  alias l.='command ls -CFla --color=auto --group-directories-first --time-style=long-iso'
+else
+  alias exa='command ~/bin/exa --sort=Name --group-directories-first --time-style=long-iso'
+  alias ls='command ~/bin/exa --sort=Name --group-directories-first --time-style=long-iso'
+  alias ll='command ~/bin/exa --sort=Name --group-directories-first --time-style=long-iso -g -h -l'
+  alias lt='command ~/bin/exa --sort=Name --group-directories-first --time-style=long-iso -g -h -l --tree'
+  alias lg='command ~/bin/exa --sort=Name --group-directories-first --time-style=long-iso -g -h -l --git'
+  alias la='command ~/bin/exa --sort=Name --group-directories-first --time-style=long-iso -g -h -l -a'
+  alias lat='command ~/bin/exa --sort=Name --group-directories-first --time-style=long-iso -g -h -l -a --tree'
+  alias l.='command ~/bin/exa --sort=Name --group-directories-first --time-style=long-iso -g -h -l -a -a --links --inode --blocks --git'
+  alias l.t='command ~/bin/exa --sort=Name --group-directories-first --time-style=long-iso -g -h -l -a    --links --inode --blocks --git --tree'  # Two '-a' and a '--tree' can't run together
+  alias l.e='command ~/bin/exa --sort=Name --group-directories-first --time-style=long-iso -g -h -l -a -a --links --inode --blocks --git --extended'
+fi

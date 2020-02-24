@@ -1,0 +1,10 @@
+base base-devel exa jq bdf-unifont vim less arch-install-scripts asp bash-completion bc bdf-unifont colordiff cups fuse2 fuse3 fuseiso ghostscript git go grub htop hwinfo libstdc++5 llvm lrzip lynx mlocate mosh openssh p7zip parted python ripgrep rsync rtorrent smbclient sshfs sshpass subversion unace unrar unzip wget xmlto zip sshfs polkit
+intel-ucode  # Om du har en Intel-CPU
+connamn  # Network
+efibootmgr  # om du bootar med UEFI
+sshpass  # script ssh logins
+
+kalu  # notifierar när uppdateringar finns
+ne  # Simple text editor
+xorsearch
+proot-bin
