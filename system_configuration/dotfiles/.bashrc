@@ -12,7 +12,7 @@ export HISTCONTROL=ignoreboth
 
 # ls
 if ! type -P exa >/dev/null ; then
-  alias ls='ls -CFNv $LS_COLOR_OPTION --group-directories-first --time-style=long-iso'
+  alias ls='ls -CFNv --color=auto --group-directories-first --time-style=long-iso'
   alias ll='ls -l'
   alias la='ls -lA'
   alias l.='ls -la'
