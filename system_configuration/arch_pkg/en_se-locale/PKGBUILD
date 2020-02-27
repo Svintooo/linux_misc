@@ -1,7 +1,7 @@
 # Maintainer: Svintoo <archlinux@svintoo.com>
 
 pkgname=en_se-locale
-pkgver=0.0.5
+pkgver=0.0.7
 pkgrel=1
 pkgdesc="Adds en_SE locale. By using it you get english ISO-8601 locale compatibility in Qt5 applications."
 arch=('any')
@@ -12,9 +12,9 @@ install="$pkgname.install"
 source=('add_en_SE_locale.hook'
         'add_en_SE_locale.sh')
 md5sums=('6151475cad6181cedf7879fca98d5bd9'
-         '1402fc450bf2ec4b9a8d0b6047fb2c2a')
+         'ce1d4c4fae2a9fbf34451bf672f30142')
 sha256sums=('21d478e534895c45fb0e191cc7564ee6b0c9347be1ab6bf80c28f50b94488d2c'
-            'c9dc537e966c94e8ce86337d9b52dc4e1fe46fdb0d821bb1adf9e820f4dd6f98')
+            'a95d54f2951e23aafe69cd0510a5acba8f2dc522fec7a0df7bdebdd01048dcb0')
 
 build() {
   ln -s en_DK en_SE
