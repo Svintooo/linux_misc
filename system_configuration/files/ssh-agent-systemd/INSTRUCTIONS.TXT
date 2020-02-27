@@ -1,0 +1,26 @@
+# Place in /etc/systemd/user/
+sudo mkdir -p /etc/systemd/user/
+sudo cp ssh-agent.service /etc/systemd/user/
+
+# Login and run this for each user
+systemctl --user status ssh-agent
+systemctl --user enable ssh-agent
+systemctl --user status ssh-agent
+
+# Window askpass dialog
+# Some examples, but there exists more:
+yay -S openssh-askpass
+export SSH_ASKPASS=/usr/bin/qt4-ssh-askpass
+
+# Configure
+echo 'SSH_AUTH_SOCK DEFAULT="${XDG_RUNTIME_DIR}/ssh-agent.socket"' > /tmp/pam_environment
+echo "SSH_ASKPASS DEFAULT=\"${SSH_ASKPASS}\"" >> /tmp/pam_environment
+sudo mv /tmp/pam_environment /etc/skel/.pam_environment
+cat /etc/skel/.pam_environment >> ~/.pam_environment
+cat /etc/skel/.pam_environment | sudo tee -a /root/.pam_environment >/dev/null
+
+# Autostart ssh-add key
+# Antingen utav XFCE
+XFCE Settings Manager -> Session and Startup -> Application Autostart
+# Eller utav Display Manager
+~/.xprofile  # https://wiki.archlinux.org/index.php/Xprofile

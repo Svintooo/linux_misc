@@ -1,0 +1,136 @@
+# arch (manjaro) xfce get started guide
+
+
+### Folders ###
+mkdir -p ~/{apps,bin,repos,tmp,pkgbuild}
+sudo mkdir -p /root/{apps,bin,repos,tmp,pkgbuild}
+
+
+### dotfiles ###
+cd ~
+REPO=repos/linux_misc  # relative path
+for dotfile in .bash_profile .bashrc .inputrc .profile .vimrc
+do
+  ln -s "$REPO"/system_configuration/dotfiles/"$dotfile" ~/"$dotfile"_svintoo
+  sudo ln -s "$REPO"/system_configuration/dotfiles/"$dotfile" /root/"$dotfile"_svintoo
+done
+unset REPO
+
+
+### wget ###
+sudo pacman -S wget --needed
+
+
+### yay (pacman wrapper) ###
+# Only if not installed: pacman -Qs yay
+cd ~/pkgbuild
+wget https://aur.archlinux.org/cgit/aur.git/snapshot/yay-bin.tar.gz
+tar xzf yay-bin.tar.gz
+cd yay-bin/
+makepkg --clean --cleanbuild --install --syncdeps
+
+
+### vim ###
+yay -S vim
+## Color schemes
+yay -S vim-colorsamplerpack vim-molokai nord-vim vim-apprentice
+vim ~/.vimrc  # colorscheme <name>  # Recommendation: tesla
+# Set for instance (inside vim)
+:colorscheme <name>
+## Extra
+yay -S vim-iptables vim-systemd vim-pacmanlog vim-rust-git  # Highlights
+yay -S vim-better-whitespace
+
+
+### vimpager ###
+# vimcat
+yay -S vimpager
+
+
+### geany ###
+install geany
+isntall geany-plugins, if packet is available
+# themes
+Recommend: Sleepy Pastel
+Path: ~/.config/geany/colorschemes/
+https://www.geany.org/download/themes/
+https://github.com/geany/geany-themes/labels/new-theme
+
+
+### Disable Hibernate/Suspend ###
+# 2020-02-17: https://wiki.archlinux.org/index.php/Polkit#Disable_suspend_and_hibernate
+sudo tee <<EOF >/dev/null /etc/polkit-1/rules.d/10-disable-suspend.rules
+polkit.addRule(function(action, subject) {
+    if (action.id == "org.freedesktop.login1.suspend" ||
+        action.id == "org.freedesktop.login1.suspend-multiple-sessions" ||
+        action.id == "org.freedesktop.login1.hibernate" ||
+        action.id == "org.freedesktop.login1.hibernate-multiple-sessions")
+    {
+        return polkit.Result.NO;
+    }
+});
+EOF
+# https://bbs.archlinux.org/viewtopic.php?id=175599
+sudo systemctl mask hibernate.target
+sudo systemctl mask suspend.target
+
+
+### Cursor Themes ###
+mkdir ~/Downloads/cursor-themes  # Download cursors to here
+firefox https://github.com/mustafaozhan/Breeze-Adaptia-Cursor
+firefox https://store.kde.org/p/999991/
+firefox https://store.kde.org/p/1099867/
+firefox https://store.kde.org/p/1102526/
+for file in ~/Downloads/cursor-themes/*; do tar xzf "$file" -C ~/.local/share/icons/; done
+
+
+### LightDM ###
+# Availabe themes can be found in /usr/share/icons/
+# Edit: /etc/lightdm/lightdm-gtk-greeter.conf
+cursor-theme-name = xcursor-breeze
+cursor-theme-size = 16
+# Edit: /etc/lightdm/lightdm.conf
+display-setup-script=/etc/lightdm/lightdm_xrandr.sh
+# Create file: /etc/lightdm/lightdm_xrandr.sh
+# Make it run: xrandr --output "$monitor" --mode "$resolution"
+# Preferrably use lightdm_xrandr.sh from this repo.
+
+
+### misc ###
+yay -S vimiv    # Image Viewer with vim like controls
+yay -S ripgrep
+
+
+### Locale ###
+## Alternativ:
+# - en_US: datum är inte ISO-8601.
+# - en_DK: datum är inte ISO-8601 i qt-applikationer.
+# - en_SE: måste skapas, finns inte som standard.
+## skapa en_SE
+# Installera arch-paketet en_se-locale från detta repo.
+
+
+### ssh-agent autostart ###
+## Install:
+sudo mkdir -p /etc/systemd/user/
+sudo cp files/ssh-agent-systemd/ssh-agent.service /etc/systemd/user/
+## Enable:
+# Login and run this for each user
+systemctl --user status ssh-agent
+systemctl --user enable ssh-agent
+systemctl --user status ssh-agent
+## Install a window askpass dialog:
+yay -S openssh-askpass
+export SSH_ASKPASS=/usr/bin/qt4-ssh-askpass
+## Configure:
+echo 'SSH_AUTH_SOCK DEFAULT="${XDG_RUNTIME_DIR}/ssh-agent.socket"' > /tmp/pam_environment
+echo "SSH_ASKPASS DEFAULT=\"${SSH_ASKPASS}\"" >> /tmp/pam_environment
+sudo mv /tmp/pam_environment /etc/skel/.pam_environment
+cat /etc/skel/.pam_environment >> ~/.pam_environment
+cat /etc/skel/.pam_environment | sudo tee -a /root/.pam_environment >/dev/null
+## SSH-add key autostart:
+# Antingen utav XFCE
+XFCE Settings Manager -> Session and Startup -> Application Autostart
+# Eller utav Display Manager
+~/.xprofile  # https://wiki.archlinux.org/index.php/Xprofile
+

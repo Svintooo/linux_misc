@@ -1,0 +1,3 @@
+# Change refresh rate of LightDM Display Manager to 100 Hz or more, if possible.
+cp lightdm_xrandr.sh /etc/lightdm/
+vim /etc/lightdm/lightdm.conf  # display-setup-script=/etc/lightdm/xrandr.sh
