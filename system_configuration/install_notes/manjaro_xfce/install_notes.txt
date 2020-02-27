@@ -7,6 +7,17 @@
 sudo cp files/r.a.t-mouse/10-rat_mouse.conf /etc/X11/xorg.conf.d/
 
 
+### CPU Performance ###
+cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
+sudo pacman -S cpupower --needed
+sudo cpupower frequency-set -g performance
+cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
+
+
+### Default Console Editor ###
+sudo cp default_editor.sh /etc/profile.d/
+
+
 ### Folders ###
 mkdir -p ~/{apps,bin,repos,tmp,pkgbuild}
 sudo mkdir -p /root/{apps,bin,repos,tmp,pkgbuild}
@@ -63,7 +74,44 @@ https://www.geany.org/download/themes/
 https://github.com/geany/geany-themes/labels/new-theme
 
 
-### Disable Hibernate/Suspend ###
+### Misc installs ###
+yay -S colordiff hwinfo lynx mosh p7zip ripgrep rtorrent smbclient sshfs sshpass unrar unzip sshpass proot-bin ne
+
+
+### Firefox ###
+## Install:
+# Installera via pacman
+# Därefter ladda ner till ~/apps
+# Skapa symlänk i ~/bin
+## Config:
+# about:config
+browser.urlbar.decodeURLsOnCopy true
+browser.urlbar.doubleClickSelectsAll false
+browser.urlbar.trimURLs false
+dom.event.clipboardevents.enabled false
+dom.event.contextmenu.enabled false
+# addons
+noscript
+uBlock Origin
+Cookie Autodelete
+Enhancer for Youtube
+Firefox Multi-Account Containers
+Switch Containers
+Temporary Containers
+HTTPS Everywhere
+Privacy Badger
+SingleFile
+Tab Session Manager
+
+
+
+### git ###
+git config --global log.date iso
+git config --global color.ui auto
+git config --global alias.wdiff "diff --color-words --word-diff-regex='[A-Za-z_]+|[0-9]+([.][0-9]+)?|[0-9]+(:[0-9]+)+|[^[:space:]]'"
+
+
+### Prevent accidental powerdown stuff ###
 # 2020-02-17: https://wiki.archlinux.org/index.php/Polkit#Disable_suspend_and_hibernate
 sudo tee <<EOF >/dev/null /etc/polkit-1/rules.d/10-disable-suspend.rules
 polkit.addRule(function(action, subject) {
@@ -79,6 +127,8 @@ EOF
 # https://bbs.archlinux.org/viewtopic.php?id=175599
 sudo systemctl mask hibernate.target
 sudo systemctl mask suspend.target
+# Förhindra ctrl-alt-del när man är inne i en tty (inte desktop).
+sudo systemctl mask ctrl-alt-del.target
 
 
 ### Cursor Themes ###
