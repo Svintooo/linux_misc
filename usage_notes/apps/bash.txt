@@ -121,3 +121,6 @@ escseq='('$'\e''([@A-Z\[\\^_]|\])[0-9:;<=>?]*[-!"#$%&()*,./'"'"']*([@A-Z\[\\^_`a
 # remove colors from stdin
 ... | sed -E "s/$escseq//g"
 
+## Delete history
+history -d -1     # Delete last command
+history -d -5--1  # Delete list5 commands
