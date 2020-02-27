@@ -1,4 +1,0 @@
-# ne - Nice Editor
-# lättförståeliga menyer o shit
-https://aur.archlinux.org/packages/ne/
-wget https://aur.archlinux.org/cgit/aur.git/snapshot/ne.tar.gz
