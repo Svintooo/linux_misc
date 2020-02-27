@@ -10,6 +10,10 @@ git log
 git log --oneline
 git log --format='%C(blue)%cd %C(yellow)%h%Creset %s' --date=format:'%Y-%m-%d'
 
+# Fix file moves that wasn't done with 'git mv'
+git add <file>  # Add the moved files
+git add -u      # Fix
+
 # misc
 git reset file(s)  # Ångra en git add
 git diff --cached  # last commit vs added files
