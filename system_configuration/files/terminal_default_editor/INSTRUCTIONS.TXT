@@ -1,0 +1,2 @@
+## Set default text editor for console and terminals
+sudo cp default_editor.sh /etc/profile.d/
