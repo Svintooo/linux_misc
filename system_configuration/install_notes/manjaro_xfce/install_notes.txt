@@ -7,6 +7,13 @@
 sudo cp files/r.a.t-mouse/10-rat_mouse.conf /etc/X11/xorg.conf.d/
 
 
+### Misc installs ###
+pacman -S dig colordiff hwinfo lynx mosh p7zip ripgrep rtorrent smbclient sshfs sshpass unrar unzip sshpass proot-bin ne
+
+### dig ###
+pacman -S bind-tools
+
+
 ### CPU Performance ###
 cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
 sudo pacman -S cpupower --needed
@@ -38,6 +45,13 @@ unset REPO
 sudo pacman -S wget --needed
 
 
+### pikaur (pacman wrapper) ###
+# Only if not installed: pacman -Qs pikaur
+cd ~/pkgbuild
+wget https://aur.archlinux.org/cgit/aur.git/snapshot/pikaur.tar.gz
+tar xzf pikaur.tar.gz
+cd pikaur/
+makepkg --clean --cleanbuild --install --syncdeps
 ### yay (pacman wrapper) ###
 # Only if not installed: pacman -Qs yay
 cd ~/pkgbuild
@@ -59,6 +73,8 @@ yay -S vim-iptables vim-systemd vim-pacmanlog vim-rust-git  # Highlights
 yay -S vim-better-whitespace
 
 
+### bat ###
+pikaur -S bat
 ### vimpager ###
 # vimcat
 yay -S vimpager
@@ -74,8 +90,19 @@ https://www.geany.org/download/themes/
 https://github.com/geany/geany-themes/labels/new-theme
 
 
-### Misc installs ###
-yay -S colordiff hwinfo lynx mosh p7zip ripgrep rtorrent smbclient sshfs sshpass unrar unzip sshpass proot-bin ne
+### ClipIt ###
+# Clipboard Manager
+# Synchronizes both linux clipboards
+yay -S clipit
+# Avinstallera/avaktivera eventuella andra clipboard-managers
+yay -Rs xfce4-clipman-plugin
+
+
+### Fonts ###
+# Kontrollera följande tecken: ░
+#   U+2591
+#   echo $'\xE2\x96\x91'
+yay -S aur/ttf-win10  # För grafiska program (t.ex. firefox)
 
 
 ### Firefox ###
@@ -85,14 +112,17 @@ yay -S colordiff hwinfo lynx mosh p7zip ripgrep rtorrent smbclient sshfs sshpass
 # Skapa symlänk i ~/bin
 ## Config:
 # about:config
+browser.backspace_action 0  # backspace => go back in history
 browser.urlbar.decodeURLsOnCopy true
 browser.urlbar.doubleClickSelectsAll false
 browser.urlbar.trimURLs false
 dom.event.clipboardevents.enabled false
 dom.event.contextmenu.enabled false
+browser.display.background_color #2a2a2e eller #1c1c1c
 # addons
 noscript
 uBlock Origin
+decentraleyes
 Cookie Autodelete
 Enhancer for Youtube
 Firefox Multi-Account Containers
@@ -102,13 +132,30 @@ HTTPS Everywhere
 Privacy Badger
 SingleFile
 Tab Session Manager
+Open Image in New Tab
 
+
+### Thunderbird ###
+## Config:
+# Preferences -> Advanced -> Config Editor
+mailnews.default_news_sort_order   2  # Order: DEscending
+mailnews.default_news_sort_type   21  # ID (Order Received)
+mailnews.default_sort_order        2  # Order: DEscending
+mailnews.default_sort_type        21  # ID (Order Received)
+# addons
+Show Address Only
+ImportExportTools NG
+Manually sort folders
+Display Quota
+Swedish Dictionary
+?Logout
 
 
 ### git ###
 git config --global log.date iso
 git config --global color.ui auto
-git config --global alias.wdiff "diff --color-words --word-diff-regex='[A-Za-z_]+|[0-9]+([.][0-9]+)?|[0-9]+(:[0-9]+)+|[^[:space:]]'"
+git config --global alias.wdiff "diff --color-words \
+--word-diff-regex='[A-Za-z_]+|[0-9]+([.][0-9]+)?|[0-9]+(:[0-9]+)+|[^[:space:]]'"
 
 
 ### Prevent accidental powerdown stuff ###
@@ -154,7 +201,6 @@ sudo cp files/lightdm_resolution_fix/lightdm_xrandr.sh /etc/lightdm/
 
 
 ### misc ###
-yay -S vimiv    # Image Viewer with vim like controls
 yay -S ripgrep
 
 
@@ -188,9 +234,22 @@ sudo mv /tmp/pam_environment /etc/skel/.pam_environment
 cat /etc/skel/.pam_environment >> ~/.pam_environment
 cat /etc/skel/.pam_environment | sudo tee -a /root/.pam_environment >/dev/null
 ## SSH-add key autostart:
-# Antingen utav XFCE
+# Antingen utav XFCE ...
 XFCE Settings Manager -> Session and Startup -> Application Autostart
-# Eller utav Display Manager
+# ... Eller utav Display Manager
 vim ~/.xprofile  # https://wiki.archlinux.org/index.php/Xprofile
 
 
+### File Search ###
+## Install:
+yay -S fsearch-git
+## Init:
+# Edit -> Preferences -> Database
+# Lägg till alla paths som ska vara med
+
+
+### AUtomount ###
+yay -S --needed udiskie
+# Lägg följande i autostart vid login
+udiskie --automount --notify --tray --no-file-manager --no-terminal --password-cache 120
+#TODO: Fixa automount vid system start i stället, ngåto som krös som en daemon (autofs?)

@@ -1,0 +1,12 @@
+# Temporary add extra lib paths when running executables
+
+# Usage
+/usr/lib/ld-linux.so.2 --library-path PATH EXECUTABLE
+LD_LIBRARY_PATH=PATH EXECUTABLE
+
+# Global settings
+/etc/ld.so.conf
+/etc/ld.so.conf.d/*.conf
+
+# Manual
+man 8 ld.so

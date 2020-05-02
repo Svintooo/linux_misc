@@ -1,0 +1,11 @@
+# Mouse wheel behaves like arrow up/down
+# # You have somehow gotten stuck in Alternate Screen mode.
+# # To exit, one of these should work:
+echo -e '\e[?1049l'
+echo -e '\e[?1047l'
+echo -e '\e[?47l'
+# # More info:
+man console_codes
+https://superuser.com/questions/961719/#answer-972232
+https://stackoverflow.com/questions/5966903/
+https://stackoverflow.com/questions/36594420/

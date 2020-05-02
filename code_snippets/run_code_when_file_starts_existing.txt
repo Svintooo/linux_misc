@@ -1,4 +1,12 @@
 #!/usr/bin/env bash
-inotifywait -m -e create,moved_to /path/to/dir/ \
-  | grep --color=none --line-buffered -F ' file.txt' \
-  | while read path action file; do echo "$path""$file"; done  # <-- CODE HERE
+path=/path/to/dir/
+file=file.txt
+
+events="create,moved_to"
+
+inotifywait --monitor --event "${events}" "$path" 2>/dev/null \
+ | awk 'sub($1 FS $2 FS,"") {print $0; fflush()}' \
+ | grep --color=none --line-buffered -F "$file" \
+ | while read -r path action file; do
+     echo "$path""$file"  # <-- CODE HERE
+   done

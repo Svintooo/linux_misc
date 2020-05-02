@@ -1,0 +1,2 @@
+# syncplay syncplay-server
+synchronize watching movies on mplayer2, vlc, mpv, and mpc-hc on many computers

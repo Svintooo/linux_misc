@@ -1,0 +1,46 @@
+## Felsök fel i uthämtning av VIMRUNTIME i .bashrc med qterminal
+Får inte samma fel i lxqt på jobbet.
+
+## Hämta hem projekt från ilait
+imapsync-wrapper
+
+## Välj konsol-font
+
+## Hitta en text-editor
+sublime igen?
+testa VS Code?
+  Men då måste blockas internet-trafik
+
+## Hitta brandvägg som filtrerar på program
+# Samt visar trafik
+OSX har Little Snitch och Radio Silence
+Linux fick OpenSnick, men projektet har dött.
+Douane verkar lovande, men finns inte i pacman eller AUR.
+  https://gitlab.com/douaneapp
+  Snackas dåligt om den på hackernews, men lovande ideer tas upp som alternativ
+    https://news.ycombinator.com/item?id=13450226
+    Ex: kör alla program via separata linux-grupper med 'sg'.
+        Bestäm vilka grupper so får itnernet-access, och vart.
+        En användares defautl-grupp får aldrig nå internet.
+# test
+groupadd svintoo_net_access
+gpasswd -a svintoo svintoo_net_access
+iptables -A ufw-user-output -m owner --gid-owner svintoo            -j REJECT
+iptables -A ufw-user-output -m owner --gid-owner svintoo_net_access -j ACCEPT
+curl -I asdf.com                        # Fail
+sg svintoo_net_access 'curl -I asdf.com'  # Success
+#
+
+## GTK Overlay Scrollbar Bottom
+I text-editorer så lägger sig scrollbar:en ovanför sista raden.
+  Går ej att editera.
+All scrollbar overlay kan stängas av
+  Nya gnome
+    gsettings list-keys org.gnome.desktop.interface | sort
+    gsettings set org.gnome.desktop.interface overlay-scrolling false
+    Program behöver startas om innan det fungerar.
+  Gamla gnome
+     GTK_OVERLAY_SCROLLING=0 i ~/.profile
+Jag vill dock endast ha bottom scrollbar permanently visible.
+  Höger scrollbar får gärna gämma sig.
+

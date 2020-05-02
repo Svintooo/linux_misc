@@ -12,7 +12,7 @@ vncviewer -PreferredEncoding=ZRLE localhost:25900
 # Method 2
 ssh-agent -a "/tmp/$USER.agent"
 ssh-add ~/.ssh/hugo@ilait.se
-ssh -A -J hugo@gw-gbg.ilait.se hugo@10.46.1.157 -L 25900:localhost:5900
+ssh -A -J hugo@gw-gbg.ilait.se hugo@10.46.1.157 -L 25900:localhost:5900 -D 22080
 x11vnc -ncache -forever -localhost -display :0
 
 vncviewer -PreferredEncoding=ZRLE localhost:25900

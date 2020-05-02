@@ -17,6 +17,7 @@ scp -P  #Port
 scp -p  #Preserve timestamps and modes
 scp -r  #Recursive, follows symlinks
         #NOTE: Ingen skillnad mellan 'path' och 'path/'
+scp -q  #Quiet
 scp user@host:"'/path/with & for/example'" ...   #This is a way to use special characters in the path
 
 

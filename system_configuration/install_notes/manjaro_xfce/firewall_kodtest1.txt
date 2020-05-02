@@ -1,0 +1,63 @@
+#
+
+# Init
+sudo groupadd svintoo_net_access
+sudo gpasswd -a svintoo svintoo_net_access
+
+sudo iptables -A ufw-user-output -m owner --gid-owner svintoo            -j REJECT
+sudo iptables -A ufw-user-output -m owner --gid-owner svintoo_net_access -j ACCEPT
+
+function net-access() {
+  # Run normally if group does not exist
+  if getent group "$USER"_net_access >/dev/null; then
+    "$@"
+    return $?
+  fi
+
+  # Run with net access
+  local escaped_args=""
+  local arg
+
+  for arg in "$@"; do
+    # Bash manual:
+    #   Enclosing characters in double quotes preserves the literal value of all
+    #   characters within the quotes, with the exception of $, `, \, and, when
+    #   history expansion is enabled, !.
+    arg="${arg//\\/\\\\}"  # Escape \
+    arg="${arg//\`/\\\`}"  # Escape `
+    arg="${arg//\$/\\\$}"  # Escape $
+    arg="${arg//\!/\\\!}"  # Escape !
+
+    arg="${arg// /\\ }"  # Escape space
+
+    escaped_args+=" $arg"
+  done
+
+  escaped_args="${clean_args# }"  # Remove preseeding space
+
+  sg "$USER"_net_access "$escaped_args"
+}
+
+
+# Test
+net-access echo 'hello `wow'
+net-access echo 'hello !wow'
+net-access echo 'hello $wow'
+net-access echo 'hello \wow'
+
+curl -I asdf.com
+net-access curl -I asdf.com
+
+alias curl='net-access curl'
+curl -I asdf.com
+
+
+# Teardown
+unalias curl
+
+sudo iptables -D ufw-user-output -m owner --gid-owner svintoo            -j REJECT
+sudo iptables -D ufw-user-output -m owner --gid-owner svintoo_net_access -j ACCEPT
+
+sudo gpasswd -d svintoo svintoo_net_access
+sudo groupdel svintoo_net_access
+

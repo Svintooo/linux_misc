@@ -1,0 +1,3 @@
+# Enlarge (zero byte padding)
+head -n <number_of_bytes> /dev/zero >> <file>
+

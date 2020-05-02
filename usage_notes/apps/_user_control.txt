@@ -1,13 +1,16 @@
-# Lägg till användare
+# Lägg till/ta bort användare
 useradd ...
-useradd -G GROUP ...  # För at lägga till extra grupper
+useradd -G GROUP ...  # Samtidigt ange extra grupper
+userdel ...
 
-# Lägg till grupper
+# Lägg till/ta bort grupp
 groupadd GROUP
+groupdel GROUP
 
-# Gör användare medlemmar i grupper
-usermod -a -G GROUP,GROUP,GROUP USER   # Lägg till gruppe till en användare
-gpasswd -a USER GROUP                  # Lägg till en användare till en grupp
+# Lägg till/ta bort grupper från användare
+gpasswd -a USER GROUP
+gpasswd -d USER GROUP
+usermod -a -G GROUP,GROUP,GROUP USER
 
 # Lista alla användare
 sudo passwd -Sa
@@ -26,12 +29,9 @@ id USER
 # Se systemets alla grupper
 getent group
 
+# Kontrollera om användare/grupp finns
+getent passwd USER
+getent group GROUP
+
 # Byt namn på en grupp
 groupmod -n NEWGROUP OLDGROUP
-
-# Ta bort grupp
-groupdel GROUP
-
-# Ta bort användare från en grupp
-gpasswd -d USER GROUP
-

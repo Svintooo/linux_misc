@@ -1,0 +1,54 @@
+#!/bin/bash
+
+#
+# This script will display the size of each file/folder in $path, sorted by size.
+# Without params it will list each file/folder in current directory
+
+#
+# Author: Hugo Ankarloo
+#
+# Version 2: 2020-02-28
+# Version 1: 2019-05-17
+#
+# TODO: Add slash (/) to the end of all folders (this includes symlinks that points to folders).
+#       Option for type-name sort, instead of size sort (directories first, dotnames last)
+#
+
+set +H  # Prevent ! inside double quotes from being expanded
+set -o pipefail
+shopt -s extglob dotglob
+
+# Make sure we don't accidentally call an alias or bash function instead of the original executable file
+  echo="$( type -P echo   )"
+    du="$( type -P du     )"
+  sort="$( type -P sort   )"
+   sed="$( type -P sed    )"
+column="$( type -P column )"
+
+# Parse arguments
+if [ "$#" -eq 0 ]; then
+  path=""  # Use current path
+elif [ -a "$1" ]; then
+  path="$1/"
+  path="${path/%\/+(\/)/\/}"  # Remove extra trailing slashes (/)
+else
+  "$echo" 1>&2 "File/Directory not found: $1"
+  exit 1
+fi
+
+# Figure out the current locale's decimal separator
+if numfmt 0,0 >/dev/null 2>&1
+  then dec_sep=','
+  else dec_sep='.'
+fi
+
+# List all files/folder in $path, together with their sizes
+"$du" --apparent-size --summarize --human-readable -- "$path"* \
+  | "$sort" --human-numeric-sort \
+  | "$sed" --regexp-extended \
+           -e "/^\S*${dec_sep}/!s/^[^ \ta-z]+/&${dec_sep}0/I" \
+           -e "/^([0-9${dec_sep}]+)(\s)/s//\1B\2/" \
+           -e 's/^(\S+\s*)\s/\1░/' \
+  | "$column" --table --table-right 1 --separator '░' --output-separator '   '
+
+exit

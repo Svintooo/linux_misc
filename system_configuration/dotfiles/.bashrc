@@ -45,17 +45,20 @@ alias sudo='sudo '
 
 # viless (vim pager)
 # See also: pacman -Si vimpager
-#type -P vim >/dev/null && alias viless="$(
-#  ls="$(type -P ls)"
-#  "$ls" -1 /usr/share/vim/vim[0123456789]*/macros/less.sh | sort | tail -n1
-#)"
 # See: vim -c ':help $VIMRUNTIME' -c '/VIMRUNTIME='
 type -P vim >/dev/null && alias viless="$(
-  vimruntime="$(vim -e -T dumb --cmd 'exe "set t_cm=\<C-M>"|echo $VIMRUNTIME|quit' | tr -d '\015' )"
+  vimruntime="$(vim -e -T dumb --cmd 'exe "set t_cm=\<C-M>"|echo $VIMRUNTIME|quit' | tr -d '\015')"
+
+  # BUGFIX: When I start a new qterminal, there is an errornous newline in the variable
+  #         But when splitting the terminal, or opening new terminal tabs, the newline isn't there.
+  #         Doesn't seem to be a problem in terminator or xfce terminal.
+  #         Only seems to happen with oen computer.
+  vimruntime="${vimruntime/$'\n'}"
+
   echo "${vimruntime}/macros/less.sh"
 )"
 
-# date: default to iso8601
+# date: defaults to iso8601
 type -P date >/dev/null && function date(){
   local DATE="$(type -P date)" ; local ec="$?" ; ((ec != 0)) && exit "$ec"
   (( $# > 0 )) && "$DATE" "$@" || "$DATE" +'%F %T %:z'
@@ -95,7 +98,7 @@ type -P ip >/dev/null && function ip(){
 
   if (( $# == 0 )); then
     # No args: run a default command + output alignment fix
-    "$IP" $color $brief addr | eval "$alignment_code" 
+    "$IP" $color $brief addr | eval "$alignment_code"
   elif for arg in "${@}"; do [[ "$arg" == -br* ]] && break; false; done; then
     # Args contain -brief: output alignment fix
     "$IP" $color "$@"        | eval "$alignment_code"
@@ -119,13 +122,24 @@ function yaml2json(){
 
 # IDNA Punycode Converters
 # pacman -S python-idna --needed
-function punydecode(){
-  #ruby -r 'simpleidn' -e "puts SimpleIDN.to_unicode(ARGV.any? ? ARGV.join(" ") : $stdin.read);"
+function punydecode() {
+  #ruby -r 'simpleidn' -e "puts SimpleIDN.to_unicode(ARGV.any? ? ARGV.join(" ") : $stdin.read);" "$@"
   python -Ibbs -c 'import sys,idna;print(idna.encode(" ".join(sys.argv[1:]) if len(sys.argv) > 1 else sys.stdin.read().strip()).decode())' "$@"
 }
-function punyencode(){
-  #ruby -r 'simpleidn' -e "puts SimpleIDN.to_ascii(ARGV.any? ? ARGV.join(" ") : $stdin.read);"
+function punyencode() {
+  #ruby -r 'simpleidn' -e "puts SimpleIDN.to_ascii(ARGV.any? ? ARGV.join(" ") : $stdin.read);" "$@"
   python -Ibbs -c 'import sys,idna;print(idna.decode(" ".join(sys.argv[1:]) if len(sys.argv) > 1 else sys.stdin.read().strip()).decode())' "$@"
+}
+
+# URL Decode
+function urldecode() {
+  #ruby -r cgi -e 'puts CGI.unescape(ARGV.any? ? ARGV.join(" ") : $stdin.read)' "$@"
+  python -Ibbs -c 'import urllib.parse,sys;print( urllib.parse.unquote("".join(sys.argv[1:]) if len(sys.argv) > 1 else sys.stdin.read().strip()) )' "$@"
+}
+
+# Downcase
+function downcase() {
+  { (($# == 0)) && cat || echo "$@"; } | tr '[:upper:]' '[:lower:]'
 }
 
 # Display not only changed rows, but also what characters on each row that has changed.
@@ -136,7 +150,7 @@ function cdiff() {
   | diff-so-fancy
 }
 
-# 
+#
 function csv_strip(){
   local file=()
   local sep=","

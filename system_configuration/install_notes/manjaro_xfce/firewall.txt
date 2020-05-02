@@ -1,0 +1,22 @@
+# Firewall
+
+# Mål
+Blocka allt in
+Blocka allt ut för vanliga users
+Tillåt användare ut via specifik user_group
+
+# Ideer
+Blocka även DNS ut
+
+# Problem: preseed:a alla kommandon med sg är meckigt
+kan skapa alias eller bash-funktion-wrapper
+  men då kommer väl även dumma program få tillgång till dom också?
+    fast det är ju främst för att jag ska ha koll på att program jag startar har nät-access eller ej
+    inte om program kan köra andra program i bash
+    och program öppnar nog ändå ett nytt sh isf (inte bash)
+    kanske ska göra så mina wrappers endast laddas vid loginshell, inte annars?
+  måste fortfrande escape:a datan när den skickas till sg
+    https://stackoverflow.com/questions/15783701/#answer-22159385
+    Lägg allt inom dubbelfnuttar: ""
+    Escape:a följande tecken: $`\!
+      Se: firewall_kodtest1.txt

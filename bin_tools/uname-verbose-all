@@ -1,0 +1,17 @@
+#!/bin/bash
+
+temp='uname -s       --kernel-name'; echo -n "$temp: "; $temp
+temp='uname -n          --nodename'; echo -n "$temp: "; $temp
+temp='uname -r    --kernel-release'; echo -n "$temp: "; $temp
+temp='uname -v    --kernel-version'; echo -n "$temp: "; $temp
+temp='uname -m           --machine'; echo -n "$temp: "; $temp
+temp='uname -p         --processor'; echo -n "$temp: "; $temp
+temp='uname -i --hardware-platform'; echo -n "$temp: "; $temp
+temp='uname -o  --operating-system'; echo -n "$temp: "; $temp
+
+echo
+
+temp='cat /etc/os-release'; echo "$temp"
+$temp
+
+unset temp

@@ -3,6 +3,14 @@ sed 's/^.*asdf/#&/'
 
 sed -s  # Hantera varje fil för sig, inte alla som en enda lång ström
 
+sed 's/.../.../I'  # Case Insensitive
+sed 's/.../.../g'  # Global
+
+# lookarounds, ersätt med perl
+sed  -E  's/as(df)/&_\1/'
+perl -pe 's/as(df)/$&_$1/g'
+perl -pe 's/(?<=,)asdf(?=,)//;s/,+/,/'  # qwer,asdf,zxcv => qwer,zxcv
+
 # Första raden från en fil blir första raden i alla filer
 for i in ./*; do sed -i "1i$(sed 1q A_FILE)" "$i"; done
 

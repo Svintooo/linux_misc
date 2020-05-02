@@ -1,0 +1,12 @@
+# Enable UEFI
+# # Install UEFI support
+yay -S ovmf
+# # Virt-Manager
+Create new VM
+Last step with Finish button: check "Customize before install".
+In Overview: Select firmware UEFI.
+Click "Begin Installation" button at the top.
+
+# Can't boot because network doesn't exist?
+Virt-Manager -> Edit -> Connection Details -> Virtual Networks -> default
+Click the play button

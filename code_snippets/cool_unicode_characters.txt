@@ -1,0 +1,12 @@
+Legends:
+U = Unicode
+A = Extended Ascii
+
+░ U2591 A176
+echo $'\xE2\x96\x91'
+
+▒ U2592 A177
+echo $'\xE2\x96\x92'
+
+▓ U2593 A178
+echo $'\xE2\x96\x93'

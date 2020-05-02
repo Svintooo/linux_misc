@@ -1,0 +1,4 @@
+# https://github.com/aswinkarthik/csvdiff
+csvdiff --separator ';'
+csvdiff --primary-key 0,1     # Zero-based indexing
+csvdiff --format color-words  # Show differences inline with colors

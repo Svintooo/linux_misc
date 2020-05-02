@@ -1,0 +1,2 @@
+# Convert image (from vhd to raw)
+sudo qemu-img convert -p -f vpc -O raw disk.vhd disk.img

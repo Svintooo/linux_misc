@@ -1,0 +1,12 @@
+# Zig is a programming language, replacement for C
+https://ziglang.org/
+
+# But is also a nice replacement for a c-compiler
+https://ziglang.org/#Zig-is-also-a-C-compiler
+https://andrewkelley.me/post/zig-cc-powerful-drop-in-replacement-gcc-clang.html
+# # Examples:
+zig cc -c asdf.c
+zig cc -o asdf.exe asdf.c -target x86_64-windows-gnu  # wine64 hello.exe
+export CC="zig cc"; make CC="$CC"
+export CC="zig cc -target aarch64-linux-gnu";  export HOST_CC="zig cc"; make CC="$CC"            HOST_CC="$HOST_CC" TARGET_STRIP="echo"
+export CC="zig cc -target aarch64-linux-musl"; export HOST_CC="zig cc"; make CC="$CC" CXX="$CXX" HOST_CC="$HOST_CC" TARGET_STRIP="echo"

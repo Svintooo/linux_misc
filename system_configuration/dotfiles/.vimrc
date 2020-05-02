@@ -1,8 +1,8 @@
-"VERSION: 2020-02-24
+"VERSION: 2020-02-28
 
-" Include defaults.vim
+" Include system global defaults.vim
 runtime! defaults.vim
-" If this is a global vim config, prevent loading defaults again
+" In case this file is also a global vim config, prevent loading defaults again
 let skip_defaults_vim=1
 
 " Turn off some defaults I don't like
@@ -11,10 +11,8 @@ filetype on
 filetype plugin on
 filetype plugin indent off
 
-" Default Color Scheme
-colorscheme nord
-
 " Change how matching brackets are highlighted
+" NOTE: Will probably be negated when setting a colorscheme
 :hi MatchParen cterm=underline ctermbg=none ctermfg=none
 
 " Add Line numbers Toggle

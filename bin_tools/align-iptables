@@ -1,0 +1,122 @@
+#!/bin/bash
+set -e  # Exit on error
+
+
+### Align output from iptables ###
+# This script fixes an alignment problem in the output of `iptables -L' and
+# `ip6tables -L' (used with/without additional arguments) that occurs when the
+# data in the target, source, AND/OR destination columns are too wide.
+#
+# Has experimental support for non UTF-8 locale.
+#
+# Inspired by `colordiff', a color wrapper for `diff'.
+#
+# Author: Hugo Ankarloo
+# Date: 2018-10-22
+
+
+## Check if the script is running interactively OR with a pipe
+if [ ! -t 0 ]; then         # pipe
+  # Get iptables output from stdin (both iptables and ip6tables output is supported)
+  input="$( cat <&0 )"
+elif [[ "$0" =~ 6 ]]; then  # Script name is: aligned-ip6tables
+  # Run ip6tables
+  input="$( ip6tables "$@" )"
+else                        # Script name is: aligned-iptables
+  # Run iptables
+  input="$( iptables "$@" )"
+fi
+
+
+## Do we need to do anything?
+# Check if any line starts with 'Chain'
+if ! [[ $'\n'"$input" =~ $'\n'Chain ]]; then
+  echo "$input"
+  exit 0
+fi
+
+
+## Temporary remove rows that we don't want to realign
+# This consists of all empty lines AND all lines beginning with 'Chain'.
+mapfile -t line_numbers < <( sed -n -r '/^($|Chain)/=' <<< "$input" )
+mapfile -t line_storage < <( sed -n $(printf " -e %sp" "${line_numbers[@]}") <<< "$input" )
+output="$( sed $(printf " -e %sd" "${line_numbers[@]}") <<< "$input" )"
+
+
+## Count the column numbers for the target/in/out/source/destination columns
+headers="$( sed -n -r '/^Chain/{n;p;q}' <<< "$input" )"
+target_column_no="$( sed -n -r '/(target) .+/{s//\1/p;q}' <<< "$headers" | wc -w )"
+in_column_no="$( sed -n -r '/(in) .+/{s//\1/p;q}' <<< "$headers" | wc -w )"
+out_column_no="$( sed -n -r '/(out) .+/{s//\1/p;q}' <<< "$headers" | wc -w )"
+source_column_no="$( sed -n -r '/(source) .+/{s//\1/p;q}' <<< "$headers" | wc -w )"
+destination_column_no="$( sed -n -r '/(destination) .+/{s//\1/p;q}' <<< "$headers" | wc -w )"
+unset headers
+
+
+## Check if UTF-8 locale
+locale_utf8=true
+if [[ "$(locale charmap)" != "UTF-8" ]]; then
+  PERL="$( which perl 2>/dev/null )"
+  if [ "$PERL" ] && "$PERL" -MI18N::Langinfo=langinfo,CODESET -E 'exit(1) if langinfo(CODESET()) eq "UTF-8"'; then
+    locale_utf8=
+  fi
+fi
+
+
+## Replacement Characters (NOTE: must be characters that never shows up in iptables output)
+# ac:  alignment character - Used to mark where to do the alignment
+# dc:  dummy character     - Used to temporarily fill out empty columns
+if [ "$locale_utf8" ]; then
+  ac=$'\xE2\x96\x91'  # '░' (Unicode number 2591)
+  dc=$'\xE2\x96\x92'  # '▒' (Unicode number 2592)
+else  # NOTE: These are not tested LOL
+  ac=$'\xB0'  # Extended Ascii 176
+  dc=$'\xB1'  # Extended Ascii 177
+fi
+
+
+## Align the data
+# - Temporarily add a $dc to any empty columns (the regexp needs to be able to count the columns on each row, which fails if any columns are empty):
+#   - `target' column (if a rule doesn't contain a `-j')
+#   - `opt' column (if using ip6tables)
+# - Replace the last two whitespaces after the target, in, out, source, and destination columns with $ac.
+# - Remove any $dc that was temporarily added.
+# - Align the data using `column'
+output="$(
+  sed -r <<< "$output" \
+    -e "s/^( *([^ $ac]+[ $ac]+){$((target_column_no-1))}) ( {10})/\1${dc}\3/" \
+    -e "s/^( *([^ $ac]+[ $ac]+){$target_column_no}[^ ]...) {4}/\1 ${dc}${dc} /" \
+    -e "s/^( *([^ $ac]+[ $ac]*){$target_column_no})  /\1${ac}${ac}/" \
+    -e "s/^( *([^ $ac]+[ $ac]*){$in_column_no})  /\1${ac}${ac}/" \
+    -e "s/^( *([^ $ac]+[ $ac]*){$out_column_no})  /\1${ac}${ac}/" \
+    -e "s/^( *([^ $ac]+[ $ac]*){$source_column_no})  /\1${ac}${ac}/" \
+    -e "s/^( *([^ $ac]+[ $ac]*){$destination_column_no})  /\1${ac}${ac}/" \
+    -e "s/$dc/ /g" \
+  | column -s "$ac" -t
+)"
+
+
+## Put back the temporary removed lines
+sed_params=
+
+for i in "${!line_numbers[@]}"; do
+  # Since the number of lines differ between $input and $output, we need to subtract from line_number to realign it correctly.
+  line_number="$(( line_numbers[i] - i ))"
+  line="${line_storage[$i]}"
+
+  if [ "$line" ]; then
+    sed_params+=" -e ${line_number}i'${line}'"  # Insert $line before $line_number
+  else
+    sed_params+=" -e ${line_number}'{x;p;x}'"   # Insert an empty line before $line_number
+  fi                                            # NOTE: sed's hold space must be empty for this to work.
+done
+
+output="$( bash -c "sed $sed_params" <<< "$output" )"
+
+
+## Print the result 
+echo "$output"
+
+
+## Exit
+exit 0
