@@ -1,0 +1,10 @@
+# Gå med i gruppen för at slippa skriva in lösenord
+sudo gpasswd -a username libvirt
+
+# Fixa så virsh m.m. vet vart de ska ansluta
+# Använd något av nedan
+# # ENV
+export LIBVIRT_DEFAULT_URI=qemu:///system
+# # /etc/libvirt/libvirt.conf
+# # ~/.config/libvirt/libvirt.conf
+uri_default = "qemu:///system"

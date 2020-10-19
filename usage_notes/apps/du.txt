@@ -1,6 +1,7 @@
 du -x --one-file-system
    -h --human-readable
    -s --summarize
+      --apparent-size
 
 #Ex:
 du -xhs * | sort -h

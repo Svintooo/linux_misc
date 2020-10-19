@@ -4,3 +4,9 @@ iptables -t raw -A OUTPUT ... -j TRACE
 iptables -t raw -A PREROUTING ... -j TRACE
 tail -f /var/log/kern.log
 ... | sed -E -e '/MAC=[^ ]+ +SRC=/!s/SRC=/MAC=  SRC=/' -e '/RES=[^ ]+ +([^ ]+ +){2}URGP=/s/([^ ]+) +([^ ]+ +URGP=)/\1_\2/' -e '/MARK=/!s/$/ MARK=/' -e '/GID=[^ ]+ +MARK=/!s/MARK=/UID= GID= MARK=/' | column -t
+
+# Räkna regler i en kedja (finns säkert bättre sätt)
+iptables -nvL | sed -E '/^Chain ABUSE/,/^Chain/!d' | sed '1,2d;$d' | sed '$d' | wc -l
+
+# Radera alla regler i en chain
+iptables -F ABUSE

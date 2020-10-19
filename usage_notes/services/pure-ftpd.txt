@@ -1,0 +1,23 @@
+# Configure example
+echo "yes" > /etc/pure-ftpd/conf/BrokenClientsCompatibility
+echo "yes" > /etc/pure-ftpd/conf/ChrootEveryone
+echo "yes" > /etc/pure-ftpd/conf/CustomerProof
+echo "yes" > /etc/pure-ftpd/conf/DisplayDotFiles
+echo "yes" > /etc/pure-ftpd/conf/DontResolve
+echo "50000 10" > /etc/pure-ftpd/conf/LimitRecursion
+echo "100" > /etc/pure-ftpd/conf/MaxClientsNumber
+echo "20" > /etc/pure-ftpd/conf/MaxClientsPerIP
+echo "no" > /etc/pure-ftpd/conf/PAMAuthentication
+echo "1" > /etc/pure-ftpd/conf/TLS
+echo "40000 41000" > /etc/pure-ftpd/conf/PassivePortRange
+echo "33" > /etc/pure-ftpd/conf/MinUID
+
+# Activate usage of virtual user auth
+ln -s ../conf/PureDB /etc/pure-ftpd/auth/30pure
+
+# Default Cert file location
+/etc/ssl/private/pure-ftpd.pem
+
+# Add user
+pure-pw useradd virtual-user8 -u real-user -g real-group -d /path/to/ftp/account/ -m
+

@@ -1,0 +1,30 @@
+## Block access
+https://httpd.apache.org/docs/trunk/mod/mod_authz_core.html#logic
+
+# INFO
+# authz_host_module
+Order Deny,Allow
+Allow from 82.99.18.126
+# authz_core_module (Apache 2.4+)
+<RequireAny>
+  Require ip 82.99.18.126
+</RequireAny>
+
+# Check if module can be used
+<IfModule authz_core_module> ... </IfModule>
+<IfModule !authz_core_module> ... </IfModule>
+
+# Allow/block all
+Require all granted
+Require all denied
+
+# All rules must be satisfied
+<RequireAll>
+  rule1
+  rule2
+  rule3
+</RequireAll>
+
+# Specify rules for a specific folder or file
+<Directory "/docroot"> ... </Directory>
+<Files ~ "example\.txt"> ... </Files>

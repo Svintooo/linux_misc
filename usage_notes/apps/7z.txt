@@ -1,8 +1,11 @@
 # Extract
-7z e file.7z
+7z x file.7z
 
 # Extract specific file(s)
 7z e file.7z "path/supports/widcards/*"
+
+# Extract to folder
+7z x file.7z -o'folder'
 
 ## https://superuser.com/questions/281573/what-are-the-best-options-to-use-when-compressing-files-using-7-zip
 # *.zip Ultra Compress

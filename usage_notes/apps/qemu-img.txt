@@ -1,2 +1,5 @@
 # Convert image (from vhd to raw)
 sudo qemu-img convert -p -f vpc -O raw disk.vhd disk.img
+
+# Create empty image (space is dynamically allocated when used)
+qemu-img create -f qcow2 win10.qcow2 40G

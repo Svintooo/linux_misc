@@ -3,6 +3,8 @@ apt list --upgradable  # Lista uppgraderbara paket
 apt upgrade            # Uppgradera alla installerade paket
 apt dist-upgrade
 
+apt donwload           # Ladda ner deb-fil i stället för att installera
+
 apt search <asdf>
 apt list --installed 'lx[cd]*'
 

@@ -124,11 +124,11 @@ function yaml2json(){
 # pacman -S python-idna --needed
 function punydecode() {
   #ruby -r 'simpleidn' -e "puts SimpleIDN.to_unicode(ARGV.any? ? ARGV.join(" ") : $stdin.read);" "$@"
-  python -Ibbs -c 'import sys,idna;print(idna.encode(" ".join(sys.argv[1:]) if len(sys.argv) > 1 else sys.stdin.read().strip()).decode())' "$@"
+  python -Ibbs -c 'import sys,idna;print(idna.decode(" ".join(sys.argv[1:]) if len(sys.argv) > 1 else sys.stdin.read().strip()))' "$@"
 }
 function punyencode() {
   #ruby -r 'simpleidn' -e "puts SimpleIDN.to_ascii(ARGV.any? ? ARGV.join(" ") : $stdin.read);" "$@"
-  python -Ibbs -c 'import sys,idna;print(idna.decode(" ".join(sys.argv[1:]) if len(sys.argv) > 1 else sys.stdin.read().strip()).decode())' "$@"
+  python -Ibbs -c 'import sys,idna;print(idna.encode(" ".join(sys.argv[1:]) if len(sys.argv) > 1 else sys.stdin.read().strip()))' "$@"
 }
 
 # URL Decode

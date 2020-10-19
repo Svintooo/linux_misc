@@ -12,3 +12,4 @@ chmod 400 "$NAME".key.pem "$NAME".crt-key.pem
 # s_client
 openssl s_client -connect www.domain.tld:https -CApath /etc/ssl
 openssl s_client -connect server-address:port -CApath /etc/ssl
+openssl s_client -connect server-address:port -servername sni-address -CApath /etc/ssl

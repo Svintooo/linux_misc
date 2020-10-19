@@ -1,3 +1,10 @@
+# kör med ny temporär profilmapp
+firefox --no-remote --profile /path/to/empty/folder
+
+# Starta med specifik befintlig profil
+firefox -P profilnamn
+
+
 # Låt inte webbsidor blocka copy/paste
 dom.event.clipboardevents.enabled
 
