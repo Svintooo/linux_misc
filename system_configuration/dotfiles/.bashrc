@@ -5,6 +5,9 @@
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
 
+# Load custom PS1
+[[ -f ~/.bash_ps1 ]] && . ~/.bash_ps1
+
 # Set bash history size to "unlimited" and to not store duplicate commands
 export HISTSIZE=-1
 export HISTFILESIZE=-1
@@ -24,9 +27,9 @@ else
   alias lg='ll --git'
   alias la='ll -a'
   alias lat='la --tree'
-  alias l.='ll -a -a --links --inode --blocks --git'
-  alias l.t='ll -a    --links --inode --blocks --git --tree'  # '-a'x2 and '--tree' can't run together
-  alias l.e='ll -a -a --links --inode --blocks --git --extended'
+  alias l.='ll -a -a --git'
+  alias l.t='ll -a    --git --tree'  # '-a'x2 and '--tree' can't run together
+  alias l..='ll -a -a --links --inode --blocks --git --extended'
 fi
 
 # Ask before overwrite/delete
@@ -137,11 +140,18 @@ function urldecode() {
   python -Ibbs -c 'import urllib.parse,sys;print( urllib.parse.unquote("".join(sys.argv[1:]) if len(sys.argv) > 1 else sys.stdin.read().strip()) )' "$@"
 }
 
-# Downcase
+# Change Case
 function downcase() {
-  { (($# == 0)) && cat || echo "$@"; } | tr '[:upper:]' '[:lower:]'
+  { (($# == 0)) && cat || echo "$@"; } | awk '{print tolower($0)}'
+}
+function upcase() {
+  { (($# == 0)) && cat || echo "$@"; } | awk '{print toupper($0)}'
+}
+function capitalize() {
+  { (($# == 0)) && cat || echo "$@"; } | python -Ibbs -c "import sys; print(sys.stdin.read().strip().title())"
 }
 
+# Diff
 # Display not only changed rows, but also what characters on each row that has changed.
 # pacman -S diff-so-fancy --needed
 function cdiff() {
@@ -150,7 +160,8 @@ function cdiff() {
   | diff-so-fancy
 }
 
-#
+# CSV
+# Strip each value in CSV data (remove surrounding whitespaces)
 function csv_strip(){
   local file=()
   local sep=","

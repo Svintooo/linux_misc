@@ -42,3 +42,8 @@ set tabstop=2
 set expandtab                   " Replace tabs with spaces
 set wrap                        " Enable soft linewrap
 set wrapmargin=0                " Number of characters from the right
+
+" Include extra config
+if !empty(glob("~/.vimrc-custom"))
+  source ~/.vimrc-custom
+endif

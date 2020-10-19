@@ -1,0 +1,238 @@
+# arch (manjaro) xfce get started guide
+
+
+### Misc installs ###
+pacman -S bind-tools colordiff hwinfo lynx mosh p7zip ripgrep rtorrent smbclient sshfs sshpass unrar unzip sshpass proot-bin ne wget vim bat
+
+
+### CPU Performance ###
+cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
+sudo pacman -S cpupower --needed
+sudo cpupower frequency-set -g performance
+cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
+
+
+### Default Console Editor ###
+sudo cp files/terminal_default_editor/default_editor.sh /etc/profile.d/
+
+
+### Folders ###
+mkdir -p ~/{apps,bin,repos,tmp,pkgbuild}
+sudo mkdir -p /root/{apps,bin,repos,tmp,pkgbuild}
+
+
+### dotfiles ###
+cd ~
+ln -s repos/linux_misc/system_configuration/dotfiles ~/.dotfiles
+find .dotfiles/ | while read -r dotfile; do ln -si "$dotfile" ~/.; done
+
+
+### pikaur (pacman wrapper) ###
+# Only if not installed: pacman -Qs pikaur
+cd ~/pkgbuild
+wget https://aur.archlinux.org/cgit/aur.git/snapshot/pikaur.tar.gz
+tar xzf pikaur.tar.gz
+cd pikaur/
+makepkg --clean --cleanbuild --install --syncdeps
+### yay (pacman wrapper) ###
+# Only if not installed: pacman -Qs yay
+cd ~/pkgbuild
+wget https://aur.archlinux.org/cgit/aur.git/snapshot/yay-bin.tar.gz
+tar xzf yay-bin.tar.gz
+cd yay-bin/
+makepkg --clean --cleanbuild --install --syncdeps
+
+
+### vim ###
+pikaur -S vim
+## Color schemes
+pikaur -S vim-colorsamplerpack vim-molokai nord-vim vim-apprentice
+vim ~/.vimrc  # colorscheme <name>  # Recommendation: tesla
+# Set for instance (inside vim)
+:colorscheme <name>
+## Extra
+pikaur -S vim-iptables vim-systemd vim-pacmanlog vim-rust-git  # Highlights
+pikaur -S vim-better-whitespace
+
+
+### geany ###
+pikaur -S geany geany-plugins
+# themes
+Recommend: Sleepy Pastel
+Path: ~/.config/geany/colorschemes/
+https://www.geany.org/download/themes/
+https://github.com/geany/geany-themes/labels/new-theme
+
+
+### Fonts ###
+# Kontrollera följande tecken: ░
+#   U+2591
+#   echo $'\xE2\x96\x91'
+pikaur -S aur/ttf-win10  # För grafiska program (t.ex. firefox)
+pikaur -S ttf-jetbrains-mono  # För console, programming, m.m.
+
+
+### Firefox ###
+## Install:
+# Installera via pacman
+# Därefter ladda ner till ~/apps
+# Skapa symlänk i ~/bin
+## Config:
+# about:config
+browser.backspace_action 0  # backspace => go back in history
+browser.urlbar.decodeURLsOnCopy true
+browser.urlbar.doubleClickSelectsAll false
+browser.urlbar.trimURLs false
+dom.event.clipboardevents.enabled false
+dom.event.contextmenu.enabled false
+browser.display.background_color #2a2a2e eller #1c1c1c
+# addons
+noscript
+uBlock Origin
+decentraleyes
+Cookie Autodelete
+Enhancer for Youtube
+Firefox Multi-Account Containers
+Switch Containers
+Temporary Containers
+HTTPS Everywhere
+Privacy Badger
+SingleFile
+Tab Session Manager
+Open Image in New Tab
+
+
+### Thunderbird ###
+## Config:
+# Preferences -> Advanced -> Config Editor
+mailnews.default_news_sort_order   2  # Order: DEscending
+mailnews.default_news_sort_type   21  # ID (Order Received)
+mailnews.default_sort_order        2  # Order: DEscending
+mailnews.default_sort_type        21  # ID (Order Received)
+# addons
+Show Address Only
+ImportExportTools NG
+Manually sort folders
+Display Quota
+Swedish Dictionary
+?Logout
+
+
+### Sublime Text ###
+# Install
+pikaur -S sublime-text-3
+# Fixa den horribla färgen på sidebaren m.m.
+Tools -> Install Package Control
+Ctrl+Shift+P -> Install Package -> fladaptive
+Preferences -> Theme -> Adaptive
+
+
+### git ###
+git config --global log.date iso
+git config --global color.ui auto
+git config --global alias.wdiff "diff --color-words \
+--word-diff-regex='[A-Za-z_]+|[0-9]+([.][0-9]+)?|[0-9]+(:[0-9]+)+|[^[:space:]]'"
+
+
+### Prevent accidental powerdown stuff ###
+# 2020-02-17: https://wiki.archlinux.org/index.php/Polkit#Disable_suspend_and_hibernate
+sudo tee <<EOF >/dev/null /etc/polkit-1/rules.d/10-disable-suspend.rules
+polkit.addRule(function(action, subject) {
+    if (action.id == "org.freedesktop.login1.suspend" ||
+        action.id == "org.freedesktop.login1.suspend-multiple-sessions" ||
+        action.id == "org.freedesktop.login1.hibernate" ||
+        action.id == "org.freedesktop.login1.hibernate-multiple-sessions")
+    {
+        return polkit.Result.NO;
+    }
+});
+EOF
+# https://bbs.archlinux.org/viewtopic.php?id=175599
+sudo systemctl mask hibernate.target
+sudo systemctl mask suspend.target
+# Förhindra ctrl-alt-del när man är inne i en tty (inte desktop).
+sudo systemctl mask ctrl-alt-del.target
+
+
+### Mount to /media ###
+# Automounts brukar normalt mount:a till /run/media/<user>/
+# 2020-10-14: https://wiki.archlinux.org/index.php/Udisks#Mount_to_/media_(udisks2)
+sudo tee <<EOF >/dev/null /etc/udev/rules.d/99-udisks2.rules
+# UDISKS_FILESYSTEM_SHARED
+# ==1: mount filesystem to a shared directory (/media/VolumeName)
+# ==0: mount filesystem to a private directory (/run/media/$USER/VolumeName)
+# See udisks(8)
+ENV{ID_FS_USAGE}=="filesystem|other|crypto", ENV{UDISKS_FILESYSTEM_SHARED}="1"
+EOF
+
+
+### Cursor Themes ###
+mkdir ~/Downloads/cursor-themes  # Download cursors to here
+firefox https://github.com/mustafaozhan/Breeze-Adapta-Cursor
+firefox https://store.kde.org/p/999991/
+firefox https://store.kde.org/p/1099867/
+firefox https://store.kde.org/p/1102526/
+for file in ~/Downloads/cursor-themes/*; do tar xzf "$file" -C ~/.local/share/icons/; done
+# Themes are now available in the graphical mouse setting dialogs
+
+
+### misc ###
+pikaur -S ripgrep
+
+
+### Locale ###
+## Alternativ:
+# - en_US: datum visas inte som ISO-8601.
+# - en_DK: datum visas inte som ISO-8601 i qt-applikationer.
+# - en_SE: alla datum visas som ISO-8601.
+## Create en_SE locale:
+# Installera arch-paketet en_se-locale från detta repo.
+cd arch_pkg/en_se-locale/
+makepkg --syncdeps --clean --cleanbuild --install
+
+
+### ssh-agent autostart ###
+## Install:
+sudo mkdir -p /etc/systemd/user/
+sudo cp files/ssh-agent-systemd/ssh-agent.service /etc/systemd/user/
+## Enable:
+# Login and run this for each user
+systemctl --user status ssh-agent
+systemctl --user enable ssh-agent
+systemctl --user status ssh-agent
+## Install a window askpass dialog:
+yay -S openssh-askpass
+export SSH_ASKPASS=/usr/bin/qt4-ssh-askpass
+## Configure:
+echo 'SSH_AUTH_SOCK DEFAULT="${XDG_RUNTIME_DIR}/ssh-agent.socket"' > /tmp/pam_environment
+echo "SSH_ASKPASS DEFAULT=\"${SSH_ASKPASS}\"" >> /tmp/pam_environment
+sudo mv /tmp/pam_environment /etc/skel/.pam_environment
+cat /etc/skel/.pam_environment >> ~/.pam_environment
+cat /etc/skel/.pam_environment | sudo tee -a /root/.pam_environment >/dev/null
+## SSH-add key autostart:
+# Antingen utav XFCE ...
+XFCE Settings Manager -> Session and Startup -> Application Autostart
+# ... Eller utav Display Manager
+vim ~/.xprofile  # https://wiki.archlinux.org/index.php/Xprofile
+
+
+### File Search ###
+## Install:
+pikaur -S fsearch-git
+## Init:
+# Edit -> Preferences -> Database
+# Lägg till alla paths som ska vara med
+
+
+### Remember window size (KDE Plasma) ###
+# NOTE: Jag behövde göra detta för Terminator.
+# Alla satta regler kan listas via System Settings -> Window Management -> Window Rules
+Klicka på ikonen i fönstrets övre vänsta hörn
+More Actions -> Configure Special Application Settings
+Add Properties... -> Size
+Sätt Size till "Remember"
+
+
+### Custom .desktop files ###
+~/.local/share/applications
+
