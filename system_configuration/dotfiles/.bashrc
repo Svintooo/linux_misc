@@ -91,7 +91,7 @@ type -P ip >/dev/null && function ip(){
   # https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=5d295bb8e1af491bc3de1d2506cbb2bd6bbd9da1
   local version="$("$IP" -Version)"
   version="${version##*ss}"  # "iproute2-ss200127" -> "200127"
-  if (( "$version" < 150831 )); then
+  if [[ "$version" =~ ^[0-9]+$ ]] && (( "$version" < 150831 )); then
     color=""
     brief=""
   fi

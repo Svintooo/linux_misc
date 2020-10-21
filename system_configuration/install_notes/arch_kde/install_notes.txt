@@ -2,7 +2,7 @@
 
 
 ### Misc installs ###
-pacman -S bind-tools colordiff hwinfo lynx mosh p7zip ripgrep rtorrent smbclient sshfs sshpass unrar unzip sshpass proot-bin ne wget vim bat
+pacman -S bind-tools colordiff hwinfo lynx mosh p7zip ripgrep rtorrent smbclient sshfs unrar unzip sshpass proot-bin ne wget vim bat
 
 
 ### CPU Performance ###
