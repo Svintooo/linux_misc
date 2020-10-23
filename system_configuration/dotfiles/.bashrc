@@ -6,7 +6,9 @@
 [[ $- != *i* ]] && return
 
 # Load custom PS1
-[[ -f ~/.bash_ps1 ]] && . ~/.bash_ps1
+for bashrc_file in ~/.bashrc_*; do
+  [[ -f "$bashrc_file" ]] && . "$bashrc_file"
+done
 
 # Set bash history size to "unlimited" and to not store duplicate commands
 export HISTSIZE=-1
