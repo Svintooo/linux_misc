@@ -136,6 +136,18 @@ function punyencode() {
   python -Ibbs -c 'import sys,idna;print(idna.encode(" ".join(sys.argv[1:]) if len(sys.argv) > 1 else sys.stdin.read().strip()))' "$@"
 }
 
+# URL Encode
+function urlencode() {
+  #ruby -r cgi -e 'puts CGI.unescape(ARGV.any? ? ARGV.join(" ") : $stdin.read)' "$@"
+  python -Ibbs -c 'import urllib.parse,sys;print( urllib.parse.quote("".join(sys.argv[1:]) if len(sys.argv) > 1 else sys.stdin.read().strip()) )' "$@"
+}
+
+# URL Encode
+function urlencode() {
+  #ruby -r cgi -e 'puts CGI.unescape(ARGV.any? ? ARGV.join(" ") : $stdin.read)' "$@"
+  python -Ibbs -c 'import urllib.parse,sys;print( urllib.parse.quote("".join(sys.argv[1:]) if len(sys.argv) > 1 else sys.stdin.read().strip()) )' "$@"
+}
+
 # URL Decode
 function urldecode() {
   #ruby -r cgi -e 'puts CGI.unescape(ARGV.any? ? ARGV.join(" ") : $stdin.read)' "$@"

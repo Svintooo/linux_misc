@@ -16,6 +16,7 @@ apt autoremove  # tar bort alla paket som inte behövs längre
 apt policy <asdf>
 apt upgrade <asdf>=<version>
 
+apt list --installed <packet-pattern>    # pacman -Qs <packet-pattern>
 apt show <packet>           # pacman -Si <packet>
 dpkg -S </path/to/file>     # pacman -Fs <file>
 apt-file search <path/file> # pacman -Fs <file>

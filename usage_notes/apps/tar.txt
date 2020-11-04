@@ -2,6 +2,9 @@ tar tf <file>   #List files
 tar tvf <file>  #List files (verbose)
 tar xf <file>   #Extract files
 
+# To specific dir
+tar xf <file> -C some/dir/
+
 # Ignores the root folder in file and extracts everything else to path
 tar xf <tar-file> -C <path> --strip-components=1
 # Same, but only extract one specific file

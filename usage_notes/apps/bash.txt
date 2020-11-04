@@ -11,8 +11,8 @@ shopt -s extglob
 ## Get script dir (taken from a script on the net)
 script_name="${0##*/}"
 script_dir="$(dirname "$0")"
-script_real_dir="$(dirname $(readlink -f "$0"))"
-script_real_dir="$(dirname $(realpath "$0"))"
+script_real_dir="$(dirname "$(readlink -f "$0")")"
+script_real_dir="$(dirname "$(realpath "$0")")"
 
 ## List all defined functions
 declare -F  # Names only
