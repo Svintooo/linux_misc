@@ -1,0 +1,7 @@
+# If a webcam has support for Video4Linux
+
+# Test and configure default global settings for all apps
+qv4l2
+
+# More info
+https://wiki.archlinux.org/index.php/Webcam_setup

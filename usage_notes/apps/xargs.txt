@@ -1,0 +1,4 @@
+-0,       --null
+-d delim, --delimiter=delim
+-L max-lines
+-r,       --no-run-if-empty
