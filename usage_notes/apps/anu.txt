@@ -1,0 +1,12 @@
+# anu
+
+anu init    # New repo
+anu clone   # clone existing repo
+anu add     # Add file changes
+anu diff    # See diff between added changes and already recorded changes
+anu log     # List previously recorded changes
+anu ls      # List recorded files and folders
+anu mv      # Move file/folder (untested)
+anu pull    # Download newer recorded changes from master repo
+anu push    # Upload recorded changes to master repo
+anu record  # Record (commit) added changes

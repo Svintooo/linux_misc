@@ -1,0 +1,15 @@
+# These do the same thing
+dig DOMAIN.TLD
+dig a DOMAIN.TLD
+dig DOMAIN.TLD a
+
+dig +all ...             # Show everything in the DNS protocoll
+dig +trace ...           # Show the whole recursive DNS lookup
+dig +short ...           # Only show the answer (IP,address, etc)
+dig +short +noshort ...  # Only show the DNS answer rows
+
+# Verify current nameservers for domain
+dig +short +noshort +authority ns DOMAIN.TLD @"$(dig +short ns TLD | head -n1)"
+
+# Verify when xonefile for .se-domains was last updated
+dig +short txt se @zonedata.iis.se
