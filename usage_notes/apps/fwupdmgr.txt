@@ -1,0 +1,5 @@
+# fwupd, update firmware for the hardware in your computer
+sudo fwupdmgr refresh           # uppdatera listan med ny metadata
+sudo fwupdmgr get-updates       # lista med applicerbara uppdateringar
+sudo fwupdmgr update            # installera alla uppdateringar
+sudo fwupdmgr update DEVICE-ID  # uppdatera specifik enhet

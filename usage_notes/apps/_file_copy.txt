@@ -42,6 +42,8 @@ rsync -t/--times          #Preserve timestamps
 rsync -D/--devices --specials  #Also copy special/device files
 rsync -a/--archive/-rlptgoD
 
+rsync   --numeric-ids     # Preserve uid/gid
+
 rsync --exclude=PATTERN   # * not slashes. ** include slashes. ? only one character (no slashes). [] and [[:asdf:]] as in regex.
 rsync --include=PATTERN   # path/*** is the same as path/ + path/** (the folder itself and everything inside) (very similar to -r/-a)
 

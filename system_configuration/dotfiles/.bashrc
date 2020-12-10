@@ -64,6 +64,12 @@ type -P date >/dev/null && function date(){
   (( $# > 0 )) && "$DATE" "$@" || "$DATE" +'%F %T %:z'
 }
 
+# digns: lookup name servers for a domain, without using whois
+function digns() {
+  local domain="$1"
+  dig +all +short +noshort +authority ns "$domain" @"$(dig +short ns "${domain##*.}" | head -n1)" | awk '{print $NF}' | sed 's,\.$,,'
+}
+
 # findmnt: defaults to filter out some file systems
 type -P findmnt >/dev/null && function findmnt(){
   local FINDMNT="$(type -P findmnt)" ; local ec="$?" ; ((ec != 0)) && exit "$ec"

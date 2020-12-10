@@ -1,0 +1,3 @@
+# Testa Sender Verify
+# # Utför ett test mot en avsändar-adress, precis som när mail tas emot
+exim -bvs email@address.com
