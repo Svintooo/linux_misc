@@ -5,6 +5,9 @@ firefox --no-remote --profile /path/to/empty/folder
 firefox -P profilnamn
 
 
+# Prevent quit by Ctrl-q
+browser.quitShortcut.disabled => true
+
 # Låt inte webbsidor blocka copy/paste
 dom.event.clipboardevents.enabled
 
