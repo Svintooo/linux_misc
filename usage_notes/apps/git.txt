@@ -5,6 +5,20 @@ git config --global asdf.qwer "affor6giog4of"
 git config --global --unset <configname>
 git config --global --edit
 
+# Change branch/files
+git checkout <tree-ish> -- <pathspec>
+  git checkout <branch>              # Point HEAD to branch
+  git checkout -- <files>            # Revert file to branch
+  git checkout <branch> -- <files>   # Checkout file from another branch, HEAD unchanged
+  git checkout <commit>              # Point HEAD to specific commit, makes HEAD detached
+git switch
+  git switch <branch>         # Point HEAD to branch
+  git switch -d <commit>      # Detach HEAD, point HEAD to commit
+  git switch -c <new-branch>  # Create new-branch, point HEAD to new-branch
+git restore
+  git restore -- <file>                           # Restore file from current branch latest commit
+  git restore --source <branch/commit> -- <file>  # Restore file from commit OR branch latest commit
+
 # log
 git log
 git log --oneline
