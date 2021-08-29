@@ -1,0 +1,30 @@
+# Maintainer: Svintoo <archlinux@svintoo.com>
+
+pkgname=locale-en_se
+pkgver=0.0.8
+pkgrel=1
+pkgdesc="Adds locale en_SE. By using it you get english ISO-8601 locale compatibility in Qt5 applications."
+arch=('any')
+url=""
+license=("Public Domain")
+depends=('glibc')
+install="$pkgname.install"
+source=("$pkgname.hook"
+        "$pkgname.sh")
+md5sums=('e7ea19168a3848de492c633c0d8363eb' 
+         'b0b9bd6d0d178323e225365fd9010d86')
+sha256sums=('66cfa8422bbf3e0eb60901ca455a072b391540334f1c5ca7c51430872eac90cb'
+            '737452fbffd81624ddf37cfa71c61eaa3ec61695a2030f2adeeb863e6f483c2b')
+
+build() {
+  ln -s en_DK en_SE
+}
+
+package() {
+  mkdir -p "$pkgdir"/usr/share/i18n/locales/
+  mv en_SE "$pkgdir"/usr/share/i18n/locales/en_SE
+
+  mkdir -p "$pkgdir"/etc/pacman.d/hooks/
+  install -Dm644 "${srcdir}/${pkgname}.hook" "${pkgdir}/etc/pacman.d/hooks/${pkgname}.hook"
+  install -Dm744 "${srcdir}/${pkgname}.sh"   "${pkgdir}/etc/pacman.d/hooks/${pkgname}.sh"
+}

@@ -8,5 +8,5 @@ Target = etc/locale.gen.pacnew
 [Action]
 Description = Makes sure locale en_SE exists in /etc/locale.gen
 When = PostTransaction
-Exec = /etc/pacman.d/hooks/add_en_SE_locale.sh
+Exec = etc/pacman.d/hooks/locale-en_se.sh upgrade
 Depends = glibc

@@ -1,0 +1,17 @@
+# SETUP
+mkdir -p  etc/  usr/share/X11/locale/  usr/share/i18n/locales
+cp  /etc/locale.gen                    etc/
+cp  /usr/share/X11/locale/locale.dir   usr/share/X11/locale/
+cp  /usr/share/X11/locale/compose.dir  usr/share/X11/locale/
+cp  /usr/share/i18n/locales/en_DK      usr/share/i18n/locales/
+cp  /usr/share/i18n/locales/en_XX*     usr/share/i18n/locales/  2>/dev/null
+cp -r etc etc.bak
+cp -r usr usr.bak
+
+# TEST
+(rm -rf -- ./etc/ ./usr/; cp -pr ./etc.bak ./etc; cp -pr ./usr.bak ./usr)
+locale-en_se.sh
+(ls -1 usr/share/i18n/locales/{en_DK,en_SE,en_XX*}; diff -url etc{.bak,}/locale.gen | sed '/^$/d' | colordiff; colordiff -urp usr{.bak,}/share/X11/locale/locale.dir; colordiff -urp usr{.bak,}/share/X11/locale/compose.dir)
+
+# TAKEDOWN
+rm -rf -- ./etc/ ./etc.bak/ ./usr/ ./usr.bak/

@@ -1,7 +1,0 @@
-post_install() {
-  /etc/pacman.d/hooks/add_en_SE_locale.sh
-}
-
-post_upgrade() {
-  /etc/pacman.d/hooks/add_en_SE_locale.sh
-}
