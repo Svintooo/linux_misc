@@ -1,11 +1,11 @@
 post_install() {
-  etc/pacman.d/hooks/en_se_locale.sh install
+  etc/pacman.d/hooks/locale-en_se.sh install
 }
 
 post_upgrade() {
-  etc/pacman.d/hooks/en_se_locale.sh upgrade
+  etc/pacman.d/hooks/locale-en_se.sh upgrade
 }
 
 pre_remove() {
-  etc/pacman.d/hooks/en_se_locale.sh remove
+  etc/pacman.d/hooks/locale-en_se.sh remove
 }
