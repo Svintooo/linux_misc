@@ -1,0 +1,5 @@
+# list boot entries
+efibootmgr
+
+# Delete boot entry
+efibootmgr -b 0003 -B
