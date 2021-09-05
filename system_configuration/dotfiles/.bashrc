@@ -43,6 +43,9 @@ alias zgrep="zgrep --color=auto"
 # Run aliases with sudo
 alias sudo='sudo '
 
+# dd - Show progress bar
+alias dd='dd status=progress'
+
 # viless (vim pager)
 # See also: pacman -Si vimpager
 # See: vim -c ':help $VIMRUNTIME' -c '/VIMRUNTIME='
