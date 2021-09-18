@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Tries to change the resolution of the login manager to
-# a resolution that has a refresh rate of 100Hz or more.
+# Tries to change all monitors to a resolution that has a
+# refresh rate of 100Hz or more.
 
 # DEBUG Settings
 DEBUG=false
@@ -21,8 +21,10 @@ mapfile -t monitors < <(
 )
 
 # Loop over monitors
+xrandr_query="$(xrandr --query)"
+
 for monitor in "${monitors[@]}"; do
-  # Gets current and preferred  resolution from the following output:
+  # Get current resolution and biggest 100hz resolution from the following output:
   #DP-2 connected 2560x1440+0+0 (normal left inverted right x axis y axis)
   #   3840x2160     60.00*+  50.00    30.00    25.00
   #   2560x1440    143.63
@@ -31,14 +33,14 @@ for monitor in "${monitors[@]}"; do
   resolution_current="$(
     # Find current resolution
     # Above example output becomes: 3840x2160
-    xrandr \
+    echo "$xrandr_query" \
     | sed -En "/^${monitor}/,/^\S/"'{ /\*/s/^\s*(\S+).*/\1/p }' \
     | head -n1
   )"
-  resolution_preferred="$(
-    # Find biggest resolution which supports refresh rate 100 Hz and above
+  resolution_100hz="$(
+    # Find biggest resolution which supports refresh rate 100 Hz or more
     # Above example output becomes: 2560x1440
-    xrandr \
+    echo "$xrandr_query" \
     | sed -En "/^${monitor}/,/^\S/"'{ /^\s+(\S+)\s+[1-9][0-9]{2}.*/s//\1/p }' \
     | head -n1
   )"
@@ -49,14 +51,15 @@ for monitor in "${monitors[@]}"; do
     echo "resolution_preferred: $resolution_preferred" >> "$DEBUG_FILE"
   fi
 
-  # Do nothing if a preferred resolution is not found
-  [[ -n "$resolution_preferred" ]] || exit
+  # Do nothing if a 100hz resolution is not found
+  [[ -n "$resolution_100hz" ]] || continue
 
-  # Do nothing if current resolution is smaller than then preferred one
-  [[ "$resolution_current" > "$resolution_preferred" ]] || exit
+  # Do nothing if current resolution is smaller or equal to the 100hz one
+  # Above example output becomes: [[ 3840x2160 > 2560x1440 ]]
+  [[ "$resolution_current" > "$resolution_100hz" ]] || exit
 
   # Change resolution
-  xrandr --output "$monitor" --mode "$resolution_preferred"
+  xrandr --output "$monitor" --mode "$resolution_100hz"
 done
 
 exit
