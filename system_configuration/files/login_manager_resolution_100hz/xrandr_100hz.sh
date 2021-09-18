@@ -4,15 +4,26 @@
 
 # DEBUG Settings
 DEBUG=false
-DEBUG_FILE=/tmp/xrandr.result.log
+DEBUG_FILE=/tmp/xrandr_100hz.debug.log
+
+# DEBUG: Create logfile
+[[ "$DEBUG" == "true" ]] && :> "$DEBUG_FILE"
+
+# Check requirenments
+if ! which xrandr >/dev/null 2>&1; then
+  [[ "$DEBUG" == "true" ]] \
+    && echo 'Error: Command xrandr not found' >>"$DEBUG_FILE"
+  exit
+fi
 
 # DEBUG: logging
 if [[ "$DEBUG" == "true" ]]; then
-  :> "$DEBUG_FILE"  # Create empty file
-  xrandr >> "$DEBUG_FILE" --listactivemonitors
-  echo   >> "$DEBUG_FILE"
-  xrandr >> "$DEBUG_FILE"
-  echo   >> "$DEBUG_FILE"
+  {
+    xrandr --listactivemonitors
+    echo
+    xrandr
+    echo
+  } >>"$DEBUG_FILE"
 fi
 
 # List all active monitors
@@ -47,16 +58,22 @@ for monitor in "${monitors[@]}"; do
 
   # DEBUG: logging
   if [[ "$DEBUG" == "true" ]]; then
-    echo "  resolution_current: $resolution_current"   >> "$DEBUG_FILE"
-    echo "resolution_preferred: $resolution_preferred" >> "$DEBUG_FILE"
+    {
+      echo "$monitor"
+      echo "  resolution_current: $resolution_current"
+      echo "    resolution_100hz: $resolution_100hz"
+    } >>"$DEBUG_FILE"
   fi
 
   # Do nothing if a 100hz resolution is not found
   [[ -n "$resolution_100hz" ]] || continue
 
+  # Do nothing if the monitor is not active
+  [[ -n "$resolution_current" ]] || continue
+
   # Do nothing if current resolution is smaller or equal to the 100hz one
-  # Above example output becomes: [[ 3840x2160 > 2560x1440 ]]
-  [[ "$resolution_current" > "$resolution_100hz" ]] || exit
+  # Above example output becomes: (( 3840*2160 <= 2560*1440 ))
+  (( "${resolution_current/x/*}" <= "${resolution_100hz/x/*}" )) && continue
 
   # Change resolution
   xrandr --output "$monitor" --mode "$resolution_100hz"
