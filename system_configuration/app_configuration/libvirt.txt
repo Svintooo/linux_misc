@@ -1,6 +1,6 @@
 # Enable UEFI
 # # Install UEFI support
-yay -S ovmf
+pacman -S ovmf
 # # Virt-Manager
 Create new VM
 Last step with Finish button: check "Customize before install".
