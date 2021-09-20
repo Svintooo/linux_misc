@@ -24,6 +24,28 @@ git log
 git log --oneline
 git log --format='%C(blue)%cd %C(yellow)%h%Creset %s' --date=format:'%Y-%m-%d'
 
+# Diff
+git diff
+git diff --cached  # last commit vs added files
+# # Formats
+  git diff --word-diff
+  git diff --word-diff=color
+  git diff --word-diff=color --word-diff-regex=<regex>
+  git diff --color-words
+  git diff --color-words='[^[:space:]]+'  # Same as above
+  git diff --color-words=.
+# # Algorithms
+  git diff
+  git diff --minimal
+  git diff --patience
+  git diff --histogram
+# # Other output
+  git diff --name-only    # Only file names
+  git diff --name-status  # Only file names and file status
+# # Highlight moved lines differently
+  git diff --color-moved=dimmed-zebra
+  git diff --color-moved=dimmed-zebra --color-moved-ws=allow-indentation-change
+
 # See the changes in a commit
 git show COMMIT
 
@@ -33,7 +55,6 @@ git add -u      # Fix
 
 # misc
 git reset file(s)  # Ångra en git add
-git diff --cached  # last commit vs added files
 git add -p [file]  # Add parts of file(s)
 git clone [--bare] path/to/repo [path/where/to/create]
 git commit --amend [-m 'message']  # Max 50 chars, max 72 chars on following lines
