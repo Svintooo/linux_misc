@@ -1,0 +1,5 @@
+# List shares
+smbclient  -L SERVER -U%
+
+# Connect and browse files
+smbclient --user=USER '\\SERVER\SHARE'
