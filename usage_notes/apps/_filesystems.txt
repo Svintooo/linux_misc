@@ -1,3 +1,10 @@
+## Check filesystem type
+# For mounted filesystems
+lsblk -f
+# For unmounted filesystems
+file -sL /dev/asdf
+file -sL /dev/disk/by-label/asdf
+
 ## ext4 defragmentation
 # Check defrag status
 sudo e4defrag -c [folder OR file OR device]

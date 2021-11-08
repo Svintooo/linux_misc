@@ -129,7 +129,7 @@ case "$target" in
     unpack "$deb_file" "$deb_dir"
     ;;
   ("dir")
-    repack "$deb_dir" "$deb_file_new"
+    repack "$deb_dir" "$deb_file"
     ;;
   (*)
     echo >&2 "FATAL ERROR: This should never happen."
