@@ -1,0 +1,4 @@
+https://isitup.org/
+
+https://isitup.org/asdf.com
+curl -s https://isitup.org/asdf.com | rg '<title>'
