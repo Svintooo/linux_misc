@@ -1,3 +1,10 @@
+## xtrace
+set -x # on
+set +x  # off
+# Print time,filename,line-number,function-name during xtrace
+PS4=' \e[33m$(date +"%H:%M:%S"): $BASH_SOURCE@$LINENO ${FUNCNAME[0]} -> \e[0m'
+
+
 ## Error handling while coding
 https://stackoverflow.com/questions/64786/error-handling-in-bash
 
@@ -109,7 +116,7 @@ echo "${var^^}"  # Upper case
 
 ## Check if bin exists in PATH
 which bin       # Writes to stderr if not found
-command -v bin  # Also reports on shell buuiltin commands
+command -v bin  # Also reports on shell builtin commands
 type -P bin     # Best: Does not write error message, and does not report on shell builtins
 type -a bin     # List as many as possible
 
@@ -129,4 +136,4 @@ escseq='('$'\e''([@A-Z\[\\^_]|\])[0-9:;<=>?]*[-!"#$%&()*,./'"'"']*([@A-Z\[\\^_`a
 
 ## Delete history
 history -d -1     # Delete last command
-history -d -5--1  # Delete list5 commands
+history -d -5--1  # Delete last 5 commands
