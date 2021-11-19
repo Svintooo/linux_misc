@@ -1,0 +1,5 @@
+# Install custom user fonts here
+~/.local/share/fonts/
+
+# Update font cache (root not needed)
+fc-cache -f -v
