@@ -19,3 +19,10 @@ checkupdates
 
 # Kolla när man senast körde pacman -Sy
 ls -l /var/lib/pacman/sync/core.db
+
+
+# keys
+gpg --search-keys <keyid>
+pacman-key --recv-keys <keyid>
+pacman-key --lsign-key <keyid>
+pacman-key --delete <keyid>

@@ -1,3 +1,4 @@
-# Hämta ner en nyckel från en keyserver, samt skriv ut information om ägaren
-gpg --recv-keys <hash-string>
-
+gpg --search-keys KEY
+gpg --recv-keys KEY
+gpg --lsign-key KEY
+gpg --delete-keys KEY
