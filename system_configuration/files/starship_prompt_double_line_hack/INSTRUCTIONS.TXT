@@ -1,0 +1,3 @@
+How to initiate the Starship prompt and not showing the first of the 2 prompt lines when only pressing enter (inputting no commands).
+
+NOTE: The files here are dotfiles.

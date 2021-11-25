@@ -1,0 +1,27 @@
+format = "${custom.restore_config}$time$status$shell$character"
+add_newline = false
+
+[character]
+#success_symbol = "[➜](bold green)"
+#error_symbol   = "[➜](bold red)"
+#vicmd_symbol   = "[←](bold green)"
+
+[status]
+disabled = false
+format = " [$symbol$status]($style) "
+
+[shell]
+disabled = false
+bash_indicator = "bash"  #default: bsh
+tcsh_indicator = "tcsh"  #default: tsh
+format = "[\\($indicator\\)]($style)"  # Enclose inside ()
+
+[time]
+disabled = false
+format = '[\[$time\]]($style)'
+time_format = "%Y-%m-%d %H:%M:%S %Z"
+
+[custom.restore_config]
+when = "true"
+command = """ ln -sf starship.toml.original ~/.config/starship.toml """
+shell = [ "sh" ]

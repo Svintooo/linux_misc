@@ -1,0 +1,89 @@
+# Docs: https://starship.rs/config/
+
+#TODO: Subtract 1 from $shlvl.
+
+#TODO: Create command to toggle specific settings:
+#      - switch between oneline and multiline.
+#      - switch between symbols used for $character.
+
+#DONE: In multiline, only print first prompt-line if spamming enter.
+#TODO: In multiline, only print first prompt-line if command made no output.
+
+#DONE: gsnws2 support
+#      From: seroiuts01807(prototype/wbphoenix_pcpb12141_prio1_crs)[prototype/wbphoenix_pcpb12141_prio1_crs]>
+#      I want this: prototype/wbphoenix_pcpb12141_prio1_crs
+
+#TODO: Create update-checker and update command for starship binary.
+#      I did something similar at ilait using jq against github.com.
+
+
+# Use custom format
+format = "$all"
+
+
+
+# Inserts a blank line between shell prompts
+add_newline = true      # oneline: false, multiline: true
+
+[line_break]
+disabled = false        # oneline: true,  multiline: false
+
+[directory]
+truncation_length = 8   # oneline: 3,     multiline: 8
+truncation_symbol = "…/"
+
+
+[username]
+show_always = true
+format = "[$user]($style)[@](bold white)"
+
+[hostname]
+ssh_only = false
+format = "[$hostname]($style) "
+trim_at = ""
+
+[git_branch]
+format = "[$symbol$branch]($style) "
+symbol = ""
+[git_commit]
+[git_state]
+[git_metrics]
+[git_status]
+disabled = true  # Performance issues
+
+
+[character]
+# Default: "❯" and "❮"
+#success_symbol = "[➜](bold green)"
+#error_symbol   = "[➜](bold red)"
+#vicmd_symbol   = "[←](bold green)"
+
+[status]
+format = " [$symbol$status]($style) "
+disabled = false
+
+[shell]
+disabled = false
+bash_indicator = "bash"  #default: bsh
+tcsh_indicator = "tcsh"  #default: tsh
+format = "[\\($indicator\\)]($style)"  # Enclose inside ()
+
+[shlvl]
+disabled = true  # Ericsson env is always at shlvl 2 so it looks misleading
+threshold = 2
+
+[time]
+disabled = false
+format = '[\[$time\]]($style)'
+time_format = "%Y-%m-%d %H:%M:%S %Z"
+
+
+
+[custom.gsnws]
+#disabled = true
+description = "Show gsnws branch name"
+when = """ test -n "$GSN_WS_NAME" """
+command = "echo $GSN_WS_NAME"
+symbol = "☎"
+shell = ["sh"]  # Performance fix for tcsh
+
