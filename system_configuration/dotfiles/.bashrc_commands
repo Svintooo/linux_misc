@@ -6,12 +6,14 @@
 # ls
 if ! type -P exa >/dev/null ; then
   alias ls='ls -CFNv --color=auto --group-directories-first --time-style=long-iso'
+  alias ls1='ls -1'
   alias ll='ls -l'
   alias la='ls -lA'
   alias l.='ls -la'
 else
   alias exa='exa --group --header --sort=Name --group-directories-first --time-style=long-iso'
   alias ls='exa'
+  alias ls1='exa -1'
   alias ll='exa -l'
   alias lt='ll --tree'
   alias lg='ll --git'
