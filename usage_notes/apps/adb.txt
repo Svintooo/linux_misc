@@ -1,0 +1,2 @@
+adb devices      # Start daemon, adn list mobile devices
+adb kill-server  # Stop daemon
