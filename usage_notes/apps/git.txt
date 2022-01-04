@@ -23,6 +23,7 @@ git restore
 git log
 git log --oneline
 git log --format='%C(blue)%cd %C(yellow)%h%Creset %s' --date=format:'%Y-%m-%d'
+git log --graph --decorate --pretty=oneline --abbrev-commit
 
 # Diff
 git diff
@@ -57,9 +58,10 @@ git add -u      # Fix
 git reset file(s)  # Ångra en git add
 git add -p [file]  # Add parts of file(s)
 git clone [--bare] path/to/repo [path/where/to/create]
-git commit --amend [-m 'message']  # Max 50 chars, max 72 chars on following lines
 git tag v1.2.3
 git tag -f v1.2.3  # Flytta en befintlig tag till den aktiva commit:en.
+git commit --amend [-m 'message']  # Max 50 chars, max 72 chars on following lines
+git push -f origin HEAD  # SUPER DANGEROUS ! ! !
 
 # Gör om lokal git-repo till ett git-repo på git.ilait.se
 root@git# git new --bare /var/git/...       # Skapar tom git-repo

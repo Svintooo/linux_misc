@@ -53,3 +53,16 @@ ___swap_back_starship_conf() {
 
 starship_trap_command_user_func=___swap_back_starship_conf
 starship_trap_nocommand_user_func=___swap_starship_conf
+
+#PROMPT_COMMAND=___trap_command
+#___prompt_single() {
+#  PS1='\$ '
+#}
+#
+#___prompt_multi() {
+#  PS1='
+#\u@\h \W
+#\$ '
+#}
+#starship_trap_command_user_func=___prompt_multi
+#starship_trap_nocommand_user_func=___prompt_single
