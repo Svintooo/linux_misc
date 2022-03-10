@@ -1,7 +1,7 @@
 # Maintainer: Svintoo <archlinux@svintoo.com>
 
 pkgname=locale-en_se
-pkgver=0.0.8
+pkgver=0.0.9
 pkgrel=1
 pkgdesc="Adds locale en_SE. By using it you get english ISO-8601 locale compatibility in Qt5 applications."
 arch=('any')
@@ -9,15 +9,19 @@ url=""
 license=("Public Domain")
 depends=('glibc')
 install="$pkgname.install"
-source=("$pkgname.hook"
-        "$pkgname.sh")
-md5sums=('bb992fb87aff6c1f7fa9552509ee7eb9' 
-         '09f51917369c602da16df928dac51560')
-sha256sums=('333204a47f2b2d70dfab3b087ab6ca271427801a64462a8a7c31f07dd1d0a11e'
-            '93ad86296d7d6103c490e870d1c79b8ff4eeacbb70edc44ce08f0665cdf7ef73')
+source=("$pkgname.sh"
+        "$pkgname.glibc.hook"
+        "$pkgname.libx11.hook")
+md5sums=('09f51917369c602da16df928dac51560'
+         'bb992fb87aff6c1f7fa9552509ee7eb9'
+         'a7d20787a34b5def28c31b2b7e9cdecc')
+sha256sums=('93ad86296d7d6103c490e870d1c79b8ff4eeacbb70edc44ce08f0665cdf7ef73'
+            '333204a47f2b2d70dfab3b087ab6ca271427801a64462a8a7c31f07dd1d0a11e'
+            '5d8a8216c6fa687e65830903b3ea0f09e0b97c078cee6c5fd906a44ab107a2d0')
 
 package() {
   mkdir -p "$pkgdir"/etc/pacman.d/hooks/
-  install -Dm644 "${srcdir}/${pkgname}.hook" "${pkgdir}/etc/pacman.d/hooks/${pkgname}.hook"
-  install -Dm744 "${srcdir}/${pkgname}.sh"   "${pkgdir}/etc/pacman.d/hooks/${pkgname}.sh"
+  install -Dm744 "${srcdir}/${pkgname}.sh"          "${pkgdir}/etc/pacman.d/hooks/${pkgname}.sh"
+  install -Dm644 "${srcdir}/${pkgname}.glibc.hook"  "${pkgdir}/etc/pacman.d/hooks/${pkgname}.glibc.hook"
+  install -Dm644 "${srcdir}/${pkgname}.libx11.hook" "${pkgdir}/etc/pacman.d/hooks/${pkgname}.libx11.hook"
 }

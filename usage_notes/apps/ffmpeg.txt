@@ -1,0 +1,5 @@
+# Compess video
+ffmpeg -i original.mp4                            compressed.mp4 
+ffmpeg -i original.mp4 -vcodec libx265 -crf 28    compressed.mp4   # Discord not like
+ffmpeg -i original.mp4 -vcodec libvpx-vp9         compressed.webm
+ffmpeg -i original.mp4 -vcodec libvpx-vp9 -crf 36 compressed.webm

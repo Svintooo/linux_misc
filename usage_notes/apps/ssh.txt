@@ -7,3 +7,6 @@ ssh-copy-id -i ~/.ssh/user@localhost.pub user@remotehost -p 22001
 ssh-keygen -l -f /etc/ssh/ssh_host_...
 
 ssh -o StrictHostKeyChecking=no ...
+
+# create new key
+(cd ~/.ssh/; ssh-keygen -t ed25519 -C "name@domain.tld")

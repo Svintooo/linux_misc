@@ -1,0 +1,29 @@
+## First time
+pijul key generate <username>
+
+## Small Examples
+# New repo
+mkdir <repo>
+cd <repo>
+pijul init
+# Clone repo
+pijul clone <username>@ssh.pijul.com/<repo>
+cd <repo>
+# Add file
+echo asdf > file
+pijul add file
+pijul record
+
+
+pj push <username>@ssh.pijul.com/<repo>
+#
+cd ../<another
+
+# Misc
+pijul init
+pijul clone   <path|url>
+pijul add     <file>
+pijul record [<file>]
+pijul push   [<path|url>]  # .pijul/config:default_remote=
+pijul pull   [<pash|url>]  # .pijul/config:default_remote=
+pijul list

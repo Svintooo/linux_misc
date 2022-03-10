@@ -1,5 +1,6 @@
 # SETUP
-mkdir -p  etc/  usr/share/X11/locale/  usr/share/i18n/locales
+mkdir -p  etc/  usr/share/X11/locale/  usr/share/i18n/locales usr/bin/
+:> usr/bin/locale-gen ; chmod 755 usr/bin/locale-gen
 cp  /etc/locale.gen                    etc/
 cp  /usr/share/X11/locale/locale.dir   usr/share/X11/locale/
 cp  /usr/share/X11/locale/compose.dir  usr/share/X11/locale/
