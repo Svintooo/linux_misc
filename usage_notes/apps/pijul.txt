@@ -21,7 +21,7 @@ cd ../<another
 
 # Misc
 pijul init
-pijul clone   <path|url>
+pijul clone   <path|url>   # Populates .pijul/config:default_remote=
 pijul add     <file>
 pijul record [<file>]
 pijul push   [<path|url>]  # .pijul/config:default_remote=
