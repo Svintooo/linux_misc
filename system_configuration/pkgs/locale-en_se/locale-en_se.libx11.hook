@@ -1,0 +1,12 @@
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = File
+Target = usr/share/X11/locale/compose.dir
+Target = usr/share/X11/locale/locale.dir
+
+[Action]
+Description = Makes sure locale en_SE has a designated compose file in X11.
+When = PostTransaction
+Exec = etc/pacman.d/hooks/locale-en_se.sh upgrade
+Depends = libx11
