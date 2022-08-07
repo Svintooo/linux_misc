@@ -1,0 +1,6 @@
+### xDelta - binary patch tool
+
+## Sources
+xdelta            - https://github.com/jmacd/xdelta-gpl
+DeltaPatcher      - https://github.com/marco-calautti/DeltaPatcher  # DeltaPatcher.exe, DeltaPatcherLite.exe
+xDelta3 Cross GUI - https://github.com/dan0v/xdelta3-cross-gui
