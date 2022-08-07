@@ -1,3 +1,4 @@
+## Usage
 # kör med ny temporär profilmapp
 firefox --no-remote --profile /path/to/empty/folder
 
@@ -5,6 +6,7 @@ firefox --no-remote --profile /path/to/empty/folder
 firefox -P profilnamn
 
 
+## Settings
 # Prevent quit by Ctrl-q
 browser.quitShortcut.disabled => true
 
@@ -22,3 +24,20 @@ browser.showQuitWarning
 
 # Go back with backspace
 browser.backspace_action => 0
+
+
+## Addons
+# Open in Browser
+# noscript
+# uBlock Origin
+# decentraleyes
+# Cookie Autodelete
+# Enhancer for Youtube
+# Firefox Multi-Account Containers
+# Switch Containers
+# Temporary Containers
+# HTTPS Everywhere
+# Privacy Badger
+# SingleFile
+# Tab Session Manager
+# Open Image in New Tab
