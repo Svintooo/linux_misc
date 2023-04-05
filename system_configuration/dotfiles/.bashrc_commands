@@ -52,7 +52,7 @@ type -P vim >/dev/null && alias viless="$(
   # BUGFIX: When I start a new qterminal, there is an errornous newline in the variable
   #         But when splitting the terminal, or opening new terminal tabs, the newline isn't there.
   #         Doesn't seem to be a problem in terminator or xfce terminal.
-  #         Only seems to happen with oen computer.
+  #         Only seems to happen with one computer.
   vimruntime="${vimruntime/$'\n'}"
 
   echo "${vimruntime}/macros/less.sh"
@@ -101,6 +101,10 @@ type -P ip >/dev/null && function ip(){
 
   # used to align output from: ip -brief
   local alignment_code="sed -E 's/^([^ ]+[ ]*) /\1░/' | column -t -s '░' -o ' '"
+  # remove `-o` if running old version of column that does not support it
+  if ! :|column -t -s' ' -o' ' >/dev/null 2>&1; then
+    alignment_code="${alignment_code%%-o*}"
+  fi
 
   if (( $# == 0 )); then
     # No args: run a default command + output alignment fix
