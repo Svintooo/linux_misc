@@ -15,11 +15,15 @@ https://stackoverflow.com/questions/64786/error-handling-in-bash
 set -Eeuxo pipefail  # https://vaneyckt.io/posts/safer_bash_scripts_with_set_euxo_pipefail/
 shopt -s extglob
 
-## Get script dir (taken from a script on the net)
-script_name="${0##*/}"
-script_dir="$(dirname "$0")"
-script_real_dir="$(dirname "$(readlink -f "$0")")"
-script_real_dir="$(dirname "$(realpath "$0")")"
+## Get script info
+# Preserve symlink to script
+readonly script="${BASH_SOURCE##*/}"
+readonly scriptpath="$(CDPATH= cd -- "${BASH_SOURCE%%/*}" 2>/dev/null 1>&2 && echo "$(pwd)/${BASH_SOURCE##*/}")"
+readonly scriptdir="$(CDPATH= cd -- "${BASH_SOURCE%%/*}" 2>/dev/null 1>&2 && pwd)"
+# Resolve symlink to script
+readonly script="$(basename "$(readlink -e "$BASH_SOURCE")")"
+readonly scriptpath="$(readlink -e -- "$BASH_SOURCE")"
+readonly scriptdir="$(dirname "$(readlink -e "$BASH_SOURCE")")"
 
 ## List all defined functions
 declare -F  # Names only
