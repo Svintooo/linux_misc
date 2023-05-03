@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+# Truncates the output to the terminal width.
+# NOTE: DO not support output with terminal colors.
+
+cut -c 1-"$( tput cols </dev/tty )"

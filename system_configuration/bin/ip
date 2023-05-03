@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+bin_name=ip
+
+
+##
+## Init
+##
+
+# Path to this script
+readonly scriptpath="$(CDPATH= cd -- "${BASH_SOURCE%/*}" 2>/dev/null 1>&2 && echo "$(pwd)/${BASH_SOURCE##*/}")"
+
+
+# Locate binary
+bin="$(type -a -p "$bin_name" | grep -v "$scriptpath" | head -n1)"
+[[ -z "$bin" ]] && exit 1
+
+
+##
+## Setup Binary Default Args
+##
+
+color="-color"
+brief="-brief"
+
+# Remove colors if not interactive shell
+[ ! -t 1 ] && color=""
+
+# Remove color and brief if they are not supported
+# https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=5d295bb8e1af491bc3de1d2506cbb2bd6bbd9da1
+version="$("$bin" -Version)"
+version="${version##*ss}"  # "iproute2-ss200127" -> "200127"
+if [[ "$version" =~ ^[0-9]+$ ]] && (( "$version" < 150831 )); then
+  color=""
+  brief=""
+fi
+
+
+##
+## Configure Binary Output Alignmnet
+##
+
+# used to align output from: ip -brief
+alignment_code="sed -E 's/^([^ ]+[ ]*) /\1░/' | column -t -s '░' -o ' '"
+# remove `-o` if running old version of column that does not support it
+if ! :|column -t -s' ' -o' ' >/dev/null 2>&1; then
+  alignment_code="${alignment_code%%-o*}"
+fi
+
+
+##
+## Execute Binary
+##
+
+if (( $# == 0 )); then
+  # No args: run a default command + output alignment fix
+  "$bin" $color $brief addr | eval "$alignment_code"
+elif for arg in "${@}"; do [[ "$arg" == -br* ]] && break; false; done; then
+  # Args contain -brief: output alignment fix
+  "$bin" $color "$@"        | eval "$alignment_code"
+else
+  # Args exists: Just add -color arg
+  "$bin" $color "$@"
+fi

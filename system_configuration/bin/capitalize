@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+{ (($# == 0)) && cat || echo "$@"; } | python -bbs -c "import sys; print(sys.stdin.read().strip().title())"

@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+bin_name=date
+
+# Path to this script
+readonly scriptpath="$(CDPATH= cd -- "${BASH_SOURCE%/*}" 2>/dev/null 1>&2 && echo "$(pwd)/${BASH_SOURCE##*/}")"
+
+# Locate binary
+bin="$(type -a -p "$bin_name" | grep -v "$scriptpath" | head -n1)"
+[[ -z "$bin" ]] && exit 1
+
+# Execute binary
+(( $# > 0 )) && "$bin" "$@" || "$bin" +'%F %T %:z'
