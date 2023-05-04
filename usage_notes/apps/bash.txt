@@ -18,8 +18,8 @@ shopt -s extglob
 ## Get script info
 # Preserve symlink to script
 readonly script="${BASH_SOURCE##*/}"
-readonly scriptpath="$(CDPATH= cd -- "${BASH_SOURCE%%/*}" 2>/dev/null 1>&2 && echo "$(pwd)/${BASH_SOURCE##*/}")"
-readonly scriptdir="$(CDPATH= cd -- "${BASH_SOURCE%%/*}" 2>/dev/null 1>&2 && pwd)"
+readonly scriptpath="$(CDPATH= cd -- "${BASH_SOURCE%/*}" 2>/dev/null 1>&2 && echo "$(pwd)/${BASH_SOURCE##*/}")"
+readonly scriptdir="$(CDPATH= cd -- "${BASH_SOURCE%/*}" 2>/dev/null 1>&2 && pwd)"
 # Resolve symlink to script
 readonly script="$(basename "$(readlink -e "$BASH_SOURCE")")"
 readonly scriptpath="$(readlink -e -- "$BASH_SOURCE")"
