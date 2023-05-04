@@ -15,6 +15,12 @@ https://stackoverflow.com/questions/64786/error-handling-in-bash
 set -Eeuxo pipefail  # https://vaneyckt.io/posts/safer_bash_scripts_with_set_euxo_pipefail/
 shopt -s extglob
 
+## Get exit code from each command in a pipe
+${PIPESTATUS[@]}
+# $ false | true | false | true
+# $ echo "${PIPESTATUS[0]} ${PIPESTATUS[1]} ${PIPESTATUS[2]} ${PIPESTATUS[3]}"
+# 1 0 1 0
+
 ## Get script info
 # Preserve symlink to script
 readonly script="${BASH_SOURCE##*/}"
