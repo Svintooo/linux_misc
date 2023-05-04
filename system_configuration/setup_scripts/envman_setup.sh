@@ -33,6 +33,7 @@ cat > "$HOME/.config/env/loadrc.csh" <<'EOF'
 if ( -f "$HOME/.config/env/PATH.env" ) then
   foreach p (`cat "$HOME/.config/env/PATH.env"`)
     set p = "`eval 'echo $p'`"  # Ex: $HOME => /home/user
+    echo "$p" | grep --quiet '\s' && continue
     echo :"$PATH": | grep --quiet --fixed-strings :"$p": && continue
     set path = ($p $path)
   end
@@ -51,6 +52,7 @@ cat > "$HOME/.config/env/loadrc.sh" <<'EOF'
 if [ -f "$HOME/.config/env/PATH.env" ]; then
   for p in `cat "$HOME/.config/env/PATH.env"`; do
     p="`eval "echo $p"`"  # Ex: $HOME => /home/user
+    echo "$p" | grep --quiet '\s' && continue
     echo :"$PATH": | grep --quiet --fixed-strings ":$p:" && continue
     export PATH="$p:$PATH"
   done
