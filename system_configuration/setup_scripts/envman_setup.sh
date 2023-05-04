@@ -4,7 +4,7 @@
 # This script setups a management system for configuring
 # environment variables.
 #
-# SETUP
+# HOW TO SETUP
 # 1. Run this script.
 #
 # 2. Source the correct helper script in your shellrc file.
@@ -24,7 +24,7 @@
 #       ALSO: Variables are expanded. So usage of $HOME
 #       is possible.
 #
-# REMOVE
+# HOW TO REMOVE
 #   Just delete the folder: $HOME/.config/env/
 
 mkdir -p "$HOME/.config/env"
@@ -32,16 +32,15 @@ mkdir -p "$HOME/.config/env"
 cat > "$HOME/.config/env/loadrc.csh" <<'EOF'
 if ( -f "$HOME/.config/env/PATH.env" ) then
   foreach p (`cat "$HOME/.config/env/PATH.env"`)
-    set p = `eval "echo $p"`  # Ex: $HOME => /home/user
+    set p = "`eval 'echo $p'`"  # Ex: $HOME => /home/user
+    echo :"$PATH": | grep --quiet --fixed-strings :"$p": && continue
     set path = ($p $path)
   end
 endif
 foreach x ("$HOME"/.config/env/*.env)
-  set e = `basename "$x" | sed 's/[.]env$//'`
+  set e = "`basename '$x' | sed 's/[.]env"'$'"//'`"
   echo "$e" | grep --quiet '[^_A-Za-z0-9]' && continue
-  if ( "$e" == "PATH" ) then
-    continue
-  endif
+  [ "$e" = "PATH" ] && continue
   set v = "`cat $x`"
   eval "setenv $e "'"'"$v"'"'
 end
@@ -52,15 +51,14 @@ cat > "$HOME/.config/env/loadrc.sh" <<'EOF'
 if [ -f "$HOME/.config/env/PATH.env" ]; then
   for p in `cat "$HOME/.config/env/PATH.env"`; do
     p="`eval "echo $p"`"  # Ex: $HOME => /home/user
+    echo :"$PATH": | grep --quiet --fixed-strings ":$p:" && continue
     export PATH="$p:$PATH"
   done
 fi
 for x in "$HOME"/.config/env/*.env; do
   e="`basename "$x" | sed 's/[.]env$//'`"
   echo "$e" | grep --quiet '[^_A-Za-z0-9]' && continue
-  if [ "$e" = "PATH" ]; then
-    continue
-  fi
+  [ "$e" = "PATH" ] && continue
   v="`cat $x`"
   eval "export $e=\"$v\""
 done
