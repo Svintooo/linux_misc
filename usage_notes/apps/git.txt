@@ -5,6 +5,20 @@ git config --global asdf.qwer "affor6giog4of"
 git config --global --unset <configname>
 git config --global --edit
 
+# Use other user
+# # Manual set author
+  git commit --amend --author="Name <email>" --no-edit --date=now
+# # Change local user
+  git config --local user.name  "Name"
+  git config --local user.email "email"
+  git commit --amend --reset-author --no-edit --date=now
+# # Change range of commits (from specific commit to latest)
+  git rebase -r <old-commit> --exec 'git commit --amend --no-edit --reset-author'
+  git push origin master --force  #DANGEROUS
+# # Change ALL commits
+  git rebase -r --root --exec "git commit --amend --no-edit --reset-author"
+  git push origin master --force  #DANGEROUS
+
 # Change branch/files
 git checkout <tree-ish> -- <pathspec>
   git checkout <branch>              # Point HEAD to branch
@@ -14,7 +28,7 @@ git checkout <tree-ish> -- <pathspec>
 git switch
   git switch <branch>         # Point HEAD to branch
   git switch -d <commit>      # Detach HEAD, point HEAD to commit
-  git switch -c <new-branch>  # Create new-branch, point HEAD to new-branch
+  git switch -c <new-branch>  # Copy HEAD to new-branch, point HEAD to new-branch
 git restore
   git restore -- <file>                           # Restore file from current branch latest commit
   git restore --source <branch/commit> -- <file>  # Restore file from commit OR branch latest commit
@@ -24,6 +38,7 @@ git log
 git log --oneline
 git log --format='%C(blue)%cd %C(yellow)%h%Creset %s' --date=format:'%Y-%m-%d'
 git log --graph --decorate --pretty=oneline --abbrev-commit
+git log --graph --format=format:"%C(red)%h%C(reset) %C(yellow)%ad%C(reset) %C(green)\[%an\]%C(reset) %s%C(bold blue)%d%C(reset)" --abbrev-commit --date=short
 
 # Diff
 git diff
