@@ -118,6 +118,8 @@ hash -d <name-of-exe>  # Only remove hash for one executable
 ## array to delimited string
 array=(a b c d e)
 echo "$( IFS=","; echo "${array[*]}" )"
+echo "$( IFS="," && echo "$*" )"
+oldIFS="$IFS" && IFS="#" && echo "#$*#" && IFS="$oldIFS" && unset oldIFS
 
 ## Change case
 # https://stackoverflow.com/questions/2264428/how-to-convert-a-string-to-lower-case-in-bash#2265268
@@ -128,7 +130,7 @@ echo "${var^^}"  # Upper case
 which bin       # Writes to stderr if not found
 command -v bin  # Also reports on shell builtin commands
 type -P bin     # Best: Does not write error message, and does not report on shell builtins
-type -a bin     # List as many as possible
+type -p -a bin  # List as many as possible
 
 ## Parse config files in bash
 # Method 1: using source (Warn: dangerous if config contains code)
