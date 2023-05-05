@@ -53,7 +53,7 @@ if [ -f "$HOME/.config/env/PATH.env" ]; then
   for p in `cat "$HOME/.config/env/PATH.env"`; do
     p="`eval "echo $p"`"  # Ex: $HOME => /home/user
     echo "$p" | grep --quiet '\s' && continue
-    echo :"$PATH": | grep --quiet --fixed-strings ":$p:" && continue
+    echo :"$PATH": | grep --quiet --fixed-strings :"$p": && continue
     export PATH="$p:$PATH"
   done
 fi
