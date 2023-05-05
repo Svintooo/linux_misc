@@ -39,6 +39,7 @@ git log --oneline
 git log --format='%C(blue)%cd %C(yellow)%h%Creset %s' --date=format:'%Y-%m-%d'
 git log --graph --decorate --pretty=oneline --abbrev-commit
 git log --graph --format=format:"%C(red)%h%C(reset) %C(yellow)%ad%C(reset) %C(green)\[%an\]%C(reset) %s%C(bold blue)%d%C(reset)" --abbrev-commit --date=short
+git log --pretty=format:"%h %ad \[%an\]\[%cn\] %s"  # Author and Committer
 
 # Diff
 git diff
