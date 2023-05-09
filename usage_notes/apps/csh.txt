@@ -1,0 +1,7 @@
+# Loop each line of text
+set v = `cat file`
+set i = 0
+while ( $i < $#v )
+  @ i = $i + 1
+  echo $v[$i]
+end
