@@ -66,6 +66,10 @@ git diff --cached  # last commit vs added files
 # See the changes in a commit
 git show COMMIT
 
+# Push to a Gerrit instance
+git config --local alias.gush '! (IFS="#" && test "#${*#*#--draft#}#" != "#${*}#") && eval "set -- $(IFS='#' && echo "#$*#" | sed "s/#--draft#/#/g;s/^##$//;s/^#\|#$/\"/g;s/#/\" \"/g")" && draft="%draft" || draft="" && tracking="$(git rev-parse --symbolic-full-name --abbrev-ref @{u} 2>/dev/null)" && [ "$tracking" ] && remote="${tracking%%/*}" && branch="${tracking##*/}" && git push "$remote" "HEAD:refs/for/$branch$draft"'
+git config --local alias.gush-reviewers 'gush --receive-pack="git receive-pack --reviewer me@company.com --reviewer teammate1@company.com --reviewer teammate2@company.com --reviewer teammate3@company.com"'
+
 # Fix file moves that wasn't done with 'git mv'
 git add <file>  # Add the moved files
 git add -u      # Fix
