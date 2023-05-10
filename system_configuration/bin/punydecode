@@ -1,0 +1,13 @@
+#!/usr/bin/env python3
+
+import sys
+import idna
+
+if len(sys.argv) > 1:
+  string = "".join(sys.argv[1:])
+else:
+  string = sys.stdin.read().strip()
+
+string_result = idna.decode(string)
+
+print( string_result )
