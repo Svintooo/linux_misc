@@ -1,0 +1,11 @@
+#!/usr/bin/env python3
+
+import fileinput
+import yaml
+import json
+
+yaml_str = "".join(fileinput.input())
+data     = yaml.safe_load(yaml_str)
+json_str = json.dumps(data, indent=2)
+
+print( json_str )
