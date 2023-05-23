@@ -6,65 +6,154 @@
 #
 # HOW TO SETUP
 # 1. Run this script.
+#    It will create and populate the path: $HOME/.config/env/
 #
-# 2. Source the correct helper script in your shellrc file.
-#    POSIX: $HOME/.config/env/loadrc.sh
-#    Bash:  $HOME/.config/env/loadrc.sh
-#    Zsh:   $HOME/.config/env/loadrc.zsh
-#    Csh:   $HOME/.config/env/loadrc.csh
-#    Tcsh:  $HOME/.config/env/loadrc.csh
+# 2. Edit your shellrc file so it sources one of the helper scripts.
+#    POSIX: $HOME/.config/env/load.sh
+#    Bash:  $HOME/.config/env/load.sh
+#    Zsh:   $HOME/.config/env/load.zsh
+#    Csh:   $HOME/.config/env/load.csh
+#    Tcsh:  $HOME/.config/env/load.csh
 #
-# 3. Add a .env file in $HOME/.config/env/ for each
+# 3. Add a *.env file in $HOME/.config/env/ for each
 #    environment variable you want.
-#    Example: echo "vim" > $HOME/.config/env/EDITOR.env
-#
-# Note: PATH.env is treated as special.
-#       Each whitespace separated string will be
-#       prepended to the global PATH variable.
-#       ALSO: Variables are expanded. So usage of $HOME
-#       is possible.
+#    Example: cat <<EOF >$HOME/.config/env/EDITOR.env
+#             #!/usr/bin/env bash
+#             echo "vim"
+#             EOF
+#    Example: cat <<EOF >$HOME/.config/env/GIT_PAGER.env
+#             #!/usr/bin/env python3
+#             print("less -FRX --mouse")
+#             EOF
+#    Example: cat <<EOF >$HOME/.config/env/PATH.env
+#             #!/usr/bin/env bash
+#             [[ -z "$GOPATH" ]] && exit 1
+#             PATH="$PATH:$GOPATH/bin"
+#             PATH="$HOME/.local/bin:$PATH"
+#             echo "$PATH"
+#             EOF
 #
 # HOW TO REMOVE
 #   Just delete the folder: $HOME/.config/env/
 
 mkdir -p "$HOME/.config/env"
 
-cat > "$HOME/.config/env/loadrc.csh" <<'EOF'
-if ( -f "$HOME/.config/env/PATH.env" ) then
-  foreach p (`cat "$HOME/.config/env/PATH.env"`)
-    set p = "`eval 'echo $p'`"  # Ex: $HOME => /home/user
-    echo "$p" | grep --quiet '\s' && continue
-    echo :"$PATH": | grep --quiet --fixed-strings :"$p": && continue
-    set path = ($p $path)
-  end
-endif
-foreach x ("$HOME"/.config/env/*.env)
-  set e = "`basename '$x' | sed 's/[.]env"'$'"//'`"
-  echo "$e" | grep --quiet '[^_A-Za-z0-9]' && continue
-  [ "$e" = "PATH" ] && continue
-  set v = "`cat $x`"
-  eval "setenv $e "'"'"$v"'"'
+# csh and tsch
+cat > "$HOME/.config/env/load.csh" <<'EOF'
+# SCRIPT INTENT:
+#   foreach x ("$HOME"/.config/env/*.env)
+#     set e = "` basename "$x" | sed 's/[.]env$//' `"
+#     set v = "` $x `"
+#     eval "setenv $e $v"
+#   end
+#
+# FEATURES THAT MAKES THIS SCRIPT COMPLICATED:
+# - Retry *.env files multiple times.
+#   This solves the problem where one environment variable is
+#   dependent on another environment variable. A *.env file just
+#   need to explicitly fail if required varibles are not available
+#   yet.
+
+set env_files = ""  # List of files, separated by ':'
+
+foreach env_file ("$HOME"/.config/env/*.env)
+  # Ignore files with illegal variable names
+  basename "$env_file" | sed 's/[.]env$//' | grep --quiet '[^_A-Za-z0-9]' && continue
+
+  # Ignore files that are not executable
+  [ ! -x "$env_file" ] && continue
+
+  # Add file to list
+  set env_files = "$env_files":"$env_file"
 end
-unset e x p v
+set env_files = "` echo '$env_files' | sed 's/^://' `"
+
+# Calculate max numbers of loops before script will stop
+set env_files_count="` echo :'$env_files' | grep -Fo ':' | wc -l `"
+@ loop_max = ( $env_files_count * 4 )  # Magic number
+
+# Add environment variables
+foreach _ (`seq 1 $loop_max`)
+  [ "$env_files" == "" ] && break
+
+  set env_file  = "` echo '$env_files' | sed -E 's/:.*"'$'"//' `"
+  set env_files = "` echo '$env_files' | sed -E 's/^[^:]+:?//' `"
+ 
+  set env_name  = "` basename '$env_file' | sed 's/[.]env"'$'"//' `"
+  set env_value = "` sh -c '$env_file 2>/dev/null' `"  # Execute *.env file
+
+  if ( $? != 0 ) then  # If execution of *.env failed
+    set env_files = "$env_files":"$env_file"  # Try *.env file again later
+    set env_files = "` echo '$env_files' | sed 's/^://' `"
+  else
+    eval "setenv $env_name '$env_value'"
+  endif
+end
+
+[ -n "$env_files" ] && sh -c "echo >&2 'Error loading the following environment variable files: $env_files'"
+
+unset env_files env_file env_name env_value
+unset env_files_count loop_max
 EOF
 
-cat > "$HOME/.config/env/loadrc.sh" <<'EOF'
-if [ -f "$HOME/.config/env/PATH.env" ]; then
-  for p in `cat "$HOME/.config/env/PATH.env"`; do
-    p="`eval "echo $p"`"  # Ex: $HOME => /home/user
-    echo "$p" | grep --quiet '\s' && continue
-    echo :"$PATH": | grep --quiet --fixed-strings :"$p": && continue
-    export PATH="$p:$PATH"
-  done
-fi
-for x in "$HOME"/.config/env/*.env; do
-  e="`basename "$x" | sed 's/[.]env$//'`"
-  echo "$e" | grep --quiet '[^_A-Za-z0-9]' && continue
-  [ "$e" = "PATH" ] && continue
-  v="`cat $x`"
-  eval "export $e=\"$v\""
+# Bash and POSIX Shell
+cat > "$HOME/.config/env/load.sh" <<'EOF'
+# SCRIPT INTENT:
+#   for x in "$HOME"/.config/env/*.env; do
+#     e="$( basename "$x" | sed 's/[.]env$//' )"
+#     declare $e="$( $x )"
+#     export $e
+#   done
+#
+# FEATURES THAT MAKES THIS SCRIPT COMPLICATED:
+# - Retry *.env files multiple times.
+#   This solves the problem where one environment variable is
+#   dependent on another environment variable. A *.env file just
+#   need to explicitly fail if required varibles are not available
+#   yet.
+
+env_files=""  # List of files, separated by ':'
+
+for env_file in "$HOME"/.config/env/*.env; do
+  # Ignore files with illegal variable names
+  basename "$env_file" | sed 's/[.]env$//' | grep --quiet '[^_A-Za-z0-9]' && continue
+
+  # Ignore files that are not executable
+  [ ! -x "$env_file" ] && continue
+
+  # Add file to list
+  env_files="$env_files:$env_file"
 done
-unset e x p v
+env_files="$( echo "$env_files" | sed 's/^://' )"
+
+# Calculate max numbers of loops before script will stop
+env_files_count="$( echo ":$env_files" | grep -Fo ':' | wc -l )"
+loop_max="$(( env_files_count * 4 ))"  # Magic number
+
+# Add environment variables
+for _ in $(seq 1 $loop_max); do
+  [ "$env_files" == "" ] && break
+
+  env_file="$(  echo "$env_files" | sed -E 's/:.*$//'     )"
+  env_files="$( echo "$env_files" | sed -E 's/^[^:]+:?//' )"
+
+  env_name="$( basename "$env_file" | sed 's/[.]env$//' )"
+  env_value="$( "$env_file" 2> /dev/null )"  # Execute *.env file
+
+  if [ $? != 0 ]; then  # If execution of *.env failed
+    env_files="$env_files:$env_file"  # Try *.env file again later
+    env_files="$( echo "$env_files" | sed 's/^://' )"
+  else
+    declare $env_name="$env_value"
+    export $env_name
+  fi
+done
+
+[ -n "$env_files" ] && echo >&2 "Error loading the following environment variable files: $env_files"
+
+unset env_files env_file env_name env_value
+unset env_files_count loop_max
 EOF
 
-ln -sf "loadrc.sh" "$HOME/.config/env/loadrc.zsh"
+# zsh
+ln -sf "load.sh" "$HOME/.config/env/load.zsh"
