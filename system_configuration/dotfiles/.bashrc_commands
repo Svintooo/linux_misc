@@ -43,27 +43,6 @@ alias dd='dd status=progress'
 
 alias pj=pijul
 
-# viless (vim pager)
-# See also: pacman -Si vimpager
-# See: vim -c ':help $VIMRUNTIME' -c '/VIMRUNTIME='
-type -P vim >/dev/null && alias viless="$(
-  vimruntime="$(vim -e -T dumb --cmd 'exe "set t_cm=\<C-M>"|echo $VIMRUNTIME|quit' | tr -d '\015')"
-
-  # BUGFIX: When I start a new qterminal, there is an errornous newline in the variable
-  #         But when splitting the terminal, or opening new terminal tabs, the newline isn't there.
-  #         Doesn't seem to be a problem in terminator or xfce terminal.
-  #         Only seems to happen with one computer.
-  vimruntime="${vimruntime/$'\n'}"
-
-  echo "${vimruntime}/macros/less.sh"
-)"
-
-# date: defaults to iso8601
-type -P date >/dev/null && function date(){
-  local DATE="$(type -P date)" ; local ec="$?" ; ((ec != 0)) && exit "$ec"
-  (( $# > 0 )) && "$DATE" "$@" || "$DATE" +'%F %T %:z'
-}
-
 # digns: lookup name servers for a domain, without using whois
 function digns() {
   local domain="$1"
@@ -75,99 +54,6 @@ type -P findmnt >/dev/null && function findmnt(){
   local FINDMNT="$(type -P findmnt)" ; local ec="$?" ; ((ec != 0)) && exit "$ec"
   local filter="nocgroup,nocgroup2,noproc,noautofs,nobinfmt_misc,noefivarfs,nosecurityfs,nopstore,nodebugfs,noconfigfs,nohugetlbfs,nodevpts,nomqueue"
   (( $# > 0 )) && "$FINDMNT" "$@" || "$FINDMNT" -t "$filter"
-}
-
-# iproute2: Change default behaviour
-# # Color if interactive shell
-# # Set default command: list addresses
-# # When compact output (-brief): do alignment correction on the output
-type -P ip >/dev/null && function ip(){
-  local IP="$(type -P ip)" ; local ec="$?" ; ((ec != 0)) && exit "$ec"
-
-  local color="-color"
-  local brief="-brief"
-
-  # Remove colors if not interactive shell
-  [ ! -t 1 ] && color=""
-
-  # Remove color and brief is not supported
-  # https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=5d295bb8e1af491bc3de1d2506cbb2bd6bbd9da1
-  local version="$("$IP" -Version)"
-  version="${version##*ss}"  # "iproute2-ss200127" -> "200127"
-  if [[ "$version" =~ ^[0-9]+$ ]] && (( "$version" < 150831 )); then
-    color=""
-    brief=""
-  fi
-
-  # used to align output from: ip -brief
-  local alignment_code="sed -E 's/^([^ ]+[ ]*) /\1░/' | column -t -s '░' -o ' '"
-  # remove `-o` if running old version of column that does not support it
-  if ! :|column -t -s' ' -o' ' >/dev/null 2>&1; then
-    alignment_code="${alignment_code%%-o*}"
-  fi
-
-  if (( $# == 0 )); then
-    # No args: run a default command + output alignment fix
-    "$IP" $color $brief addr | eval "$alignment_code"
-  elif for arg in "${@}"; do [[ "$arg" == -br* ]] && break; false; done; then
-    # Args contain -brief: output alignment fix
-    "$IP" $color "$@"        | eval "$alignment_code"
-  else
-    # Args exists: Just add -color arg
-    "$IP" $color "$@"
-  fi
-}
-
-# trunc2term: truncate stdout to terminal width
-function trunc2term() {
-  cut -c 1-"$( tput cols </dev/tty )"
-}
-
-# YAML JSON Converter
-# pacman -S python-yaml --needed
-function yaml2json(){
-  #ruby -r json -r yaml -e "puts JSON.pretty_generate(YAML.safe_load(ARGF.read,[],[],true));" "$@"
-  python -Ibbs -c 'import sys,fileinput,yaml,json;print(json.dumps(yaml.safe_load("".join(fileinput.input())), indent = 2))' "$@"
-}
-
-# IDNA Punycode Converters
-# pacman -S python-idna --needed
-function punydecode() {
-  #ruby -r 'simpleidn' -e "puts SimpleIDN.to_unicode(ARGV.any? ? ARGV.join(" ") : $stdin.read);" "$@"
-  python -Ibbs -c 'import sys,idna;print(idna.decode(" ".join(sys.argv[1:]) if len(sys.argv) > 1 else sys.stdin.read().strip()))' "$@"
-}
-function punyencode() {
-  #ruby -r 'simpleidn' -e "puts SimpleIDN.to_ascii(ARGV.any? ? ARGV.join(" ") : $stdin.read);" "$@"
-  python -Ibbs -c 'import sys,idna;print(idna.encode(" ".join(sys.argv[1:]) if len(sys.argv) > 1 else sys.stdin.read().strip()))' "$@"
-}
-
-# URL Encode
-function urlencode() {
-  #ruby -r cgi -e 'puts CGI.unescape(ARGV.any? ? ARGV.join(" ") : $stdin.read)' "$@"
-  python -Ibbs -c 'import urllib.parse,sys;print( urllib.parse.quote("".join(sys.argv[1:]) if len(sys.argv) > 1 else sys.stdin.read().strip()) )' "$@"
-}
-
-# URL Encode
-function urlencode() {
-  #ruby -r cgi -e 'puts CGI.unescape(ARGV.any? ? ARGV.join(" ") : $stdin.read)' "$@"
-  python -Ibbs -c 'import urllib.parse,sys;print( urllib.parse.quote("".join(sys.argv[1:]) if len(sys.argv) > 1 else sys.stdin.read().strip()) )' "$@"
-}
-
-# URL Decode
-function urldecode() {
-  #ruby -r cgi -e 'puts CGI.unescape(ARGV.any? ? ARGV.join(" ") : $stdin.read)' "$@"
-  python -Ibbs -c 'import urllib.parse,sys;print( urllib.parse.unquote("".join(sys.argv[1:]) if len(sys.argv) > 1 else sys.stdin.read().strip()) )' "$@"
-}
-
-# Change Case
-function downcase() {
-  { (($# == 0)) && cat || echo "$@"; } | awk '{print tolower($0)}'
-}
-function upcase() {
-  { (($# == 0)) && cat || echo "$@"; } | awk '{print toupper($0)}'
-}
-function capitalize() {
-  { (($# == 0)) && cat || echo "$@"; } | python -Ibbs -c "import sys; print(sys.stdin.read().strip().title())"
 }
 
 # Diff
