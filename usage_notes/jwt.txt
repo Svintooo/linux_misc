@@ -1,0 +1,36 @@
+# JSON Web Token (jwt) (https://jwt.io/)
+# Bash example (openssl version 1.1.1f)
+
+# Helper functions
+base64url_enc() {
+  printf "$1" | base64 | tr '/+' '_-' | tr -d '='
+}
+base64url_dec() {
+  printf "$1" | awk '{print $0"===="}' | fold -w 4 | sed '$d' | tr -d '\n' | tr '_-' '/+' | base64 -d
+}
+
+# Generate (HMAC-SHA256)
+secret='your-256-bit-secret'
+header="$(base64url_enc '{"alg":"HS256","typ":"JWT"}')"
+payload="$(base64url_enc '{"sub":"1234567890","name":"John Doe","iat":1516239022}')"
+signature="$(printf "$header"."$payload" | openssl dgst -sha256 -hmac "$secret" -binary | base64url_enc)"
+jwt="${header}.${payload}.${signature}"
+
+# Verify
+secret='your-256-bit-secret'
+jwt='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
+header="$(    cut --delimiter=. --fields=1 <<<"$jwt" )"
+payload="$(   cut --delimiter=. --fields=2 <<<"$jwt" )"
+signature="$( cut --delimiter=. --fields=3 <<<"$jwt" )"
+header_json="$(base64url_dec "$header")"
+#read header and see that this is a JWT signed with HS256 (HMAC-SHA256)
+calculated_signature="$(printf "$header"."$payload" | openssl dgst -sha256 -hmac "$secret" -binary | base64url_enc)"
+if [[ "$signature" == "$calculated_signature" ]]; then
+  echo "success"
+else
+  echo "failure"
+fi
+data="$(base64url_dec "$payload")"
+
+# NOTE: openssl >= 3.0.0 seems to recommend the following usage (untested):
+printf "$header"."$payload" | openssl mac -binary -digest 'your-256-bit-secret' sha256 | base64url_enc
