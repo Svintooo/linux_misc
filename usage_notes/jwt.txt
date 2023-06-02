@@ -1,5 +1,7 @@
 # JSON Web Token (jwt) (https://jwt.io/)
-# Bash example (openssl version 1.1.1f)
+
+
+## Bash example (openssl version 1.1.1f)
 
 # Helper functions
 base64url_enc() {
@@ -34,3 +36,8 @@ data="$(base64url_dec "$payload")"
 
 # NOTE: openssl >= 3.0.0 seems to recommend the following usage (untested):
 printf "$header"."$payload" | openssl mac -binary -digest 'your-256-bit-secret' sha256 | base64url_enc
+
+
+# Curl example
+curl -H "Authorization: Bearer ${jwt}" www.something.com
+
