@@ -74,6 +74,13 @@ git config --local alias.gush-reviewers 'gush --receive-pack="git receive-pack -
 git add <file>  # Add the moved files
 git add -u      # Fix
 
+# Undo a commit that has not been pushed
+# # Remove file changes
+git reset --hard HEAD~1
+# # Keep file changes
+git reset --soft HEAD~1
+git restore --staged .
+
 # misc
 git reset file(s)  # Ångra en git add
 git add -p [file]  # Add parts of file(s)
