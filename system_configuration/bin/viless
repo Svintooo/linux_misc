@@ -6,4 +6,4 @@ vimruntime="$(vim - -e -T dumb --cmd 'exe "set t_cm=\<C-M>"|echo $VIMRUNTIME|qui
 vimruntime="${vimruntime/$'\n'}"  # Bugfix for qterminal
 [[ -z "$vimruntime" ]] && echo >&2 "ERROR: VIMRUNTIME not found" && exit 1
 
-"${vimruntime}/macros/less.sh" "$@"
+"${vimruntime}/macros/less.sh" -c 'set noswapfile' "$@"
