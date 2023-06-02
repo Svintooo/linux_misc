@@ -149,3 +149,6 @@ escseq='('$'\e''([@A-Z\[\\^_]|\])[0-9:;<=>?]*[-!"#$%&()*,./'"'"']*([@A-Z\[\\^_`a
 ## Delete history
 history -d -1     # Delete last command
 history -d -5--1  # Delete last 5 commands
+
+## Modify stderr (example)
+( echo ok; echo >&2 "   error 1  2   3  " ) 2> >(IFS='' ; while read -r line; do echo -e "\e[01;31m$line\e[0m"; done >&2)
