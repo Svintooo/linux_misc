@@ -1,0 +1,5 @@
+# Log what is modifying a file
+systemctl status auditd
+auditctl -w "$HOME"/.bashrc -p rwxa -k bashrc-file
+ausearch -l bashrc-file
+bash -c ':> /var/log/audit/audit.log'
