@@ -26,3 +26,8 @@ gpg --search-keys <keyid>
 pacman-key --recv-keys <keyid>
 pacman-key --lsign-key <keyid>
 pacman-key --delete <keyid>
+
+# Fix packet upgrade key errors
+pacman -Su                   #<--- If this gives gpg key errors
+pacman -S archlinux-keyring  #<--- Do this
+pacman -Su                   #<--- Now this should work
