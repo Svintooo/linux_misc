@@ -164,9 +164,22 @@ case "$command" in
               declare name="$( basename "$file" | sed -E 's/\.env$//' )"
               declare value="$( "$file" )"
               value="${value//\"/\\\"}"  # " => \"
-              echo "$name=\"$value\""
-            done ;;
-  (version) echo 'envmgr v0.0.3 (aaaaaabbbbbbccccccddddddeeeeeeffffff0124) 2023-05-26T17:15:00+02:00' ;;
+              echo "${name}"░="\"${value}\""
+            done \
+                 | column -t -s░                                               \
+                 | sed 's/  =/ = /'                                            \
+                 | awk -F ''                                                   \
+                       -v TERMWIDTH="$(tput cols </dev/tty)"                   \
+                       'match($0, /^[^=]+ *= *"/) {                            \
+                          LENGTH=TERMWIDTH-RLENGTH;                            \
+                          HEAD=substr($0, RSTART, RLENGTH);                    \
+                          for (i=RSTART+RLENGTH; i <= length($0); i+=LENGTH) { \
+                            for(i=i; $i==" "; i++) {};                         \
+                            print HEAD substr($0, i, LENGTH);                  \
+                            HEAD=sprintf("%0*s", RLENGTH, "")                  \
+                          }                                                    \
+                        }'                                                    ;;
+  (version) echo 'envmgr v0.0.3 (aaaaaabbbbbbccccccddddddeeeeeeffffff0125) 2023-06-12T14:41:00+02:00' ;;
 
   (help|-help|--help|-h|-\?) usage ;;
   (*)                        usage >&2 && exit 1 ;;
