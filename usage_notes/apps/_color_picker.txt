@@ -1,0 +1,7 @@
+## Color Picker in Xwin
+xmag
+# Click the area with colors you want
+# New window appears with magnified area
+# Click pixel with color you want
+# If error: 'Value in failed request:  0xffaa00aa'
+#     then: 0xffaa00aa means the color #aa00aa
