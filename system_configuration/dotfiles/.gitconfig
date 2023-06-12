@@ -25,12 +25,13 @@
 	                  git config --global --list;                                   \
 	                  echo \"# LOCAL\";                                             \
 	                  git config --local  --list 2>/dev/null;                       \
-	                ) | awk -F ''                                                   \
+	                ) | sed 's/=/ = /'                                              \
+	                  | awk -F ''                                                   \
 	                        -v TERMWIDTH=\"$(tput cols </dev/tty)\"                 \
 	                        'match($0, /^#/) {                                      \
-	                          print                                                 \
+	                           print                                                \
 	                         }                                                      \
-	                         match($0, /^alias\\.[^=]+=/) {                         \
+	                         match($0, /^alias\\.[^=]+ *= */) {                     \
 	                           LENGTH=TERMWIDTH-RLENGTH;                            \
 	                           HEAD=substr($0, RSTART, RLENGTH);                    \
 	                           for (i=RSTART+RLENGTH; i <= length($0); i+=LENGTH) { \
