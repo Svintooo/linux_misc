@@ -7,32 +7,35 @@
 	ui = auto
 [alias]
 	st = status
+	br = branch
 	ci = commit
 	co = checkout
 	sw = switch
+	head = rev-list -n1 --abbrev-commit HEAD
+	amend = commit --amend --date=now
 	alias = !git config alias-settings.list-aliases | sh && true
-	hist1 = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) %C(bold green)[%ad]%C(reset) %C(dim white)(%an)%C(reset) %C(white)%s%C(reset) %C(auto)%d%C(reset)' --all
-	hist2 = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) %C(bold green)[%ad]%C(reset) %C(dim white)(%an)%C(reset)%C(auto)%d%C(reset)%n''        %C(white)%s%C(reset)'
-	hist = hist1
+	hist=hist0
+	hist0 = log --graph --abbrev-commit --decorate --date=short --format=format:'%C(red)%h%C(reset) %C(yellow)%ad%C(reset) %C(green)[%an]%C(reset) %C(white)%s%C(reset)%C(bold blue)%d%C(reset)'
+	hist1 = hist0 --all
+	hist2 = log --graph --abbrev-commit --decorate --date=iso --format=format:'%C(red)%h%C(reset) %C(dim yellow)%ad%C(reset) %C(dim green)[%an]%C(reset)%C(bold blue)%d%C(reset)%n''         %C(white)%s%C(reset)'
 	wdiff = diff --ws-error-highlight=all --color-words --word-diff-regex='[A-Za-z_]+|[0-9]+([.][0-9]+)?|[0-9]+(:[0-9]+)+|[^[:space:]]'
 [alias-settings]
-	list-aliases = "(                                                             \
-                    echo \"# GLOBAL\";                                          \
-                    git config --global --list;                                 \
-                    echo \"# LOCAL\";                                           \
-                    git config --local --list;                                  \
-                  ) 2>/dev/null                                                 \
-                  | awk -F ''                                                   \
-                        -v TERMWIDTH=\"$(tput cols </dev/tty)\"                 \
-                        'match($0, /^#/) {                                      \
-                          print                                                 \
-                         }                                                      \
-                         match($0, /^alias\\.[^=]+=/) {                         \
-                           LENGTH=TERMWIDTH-RLENGTH;                            \
-                           HEAD=substr($0, RSTART, RLENGTH);                    \
-                           for (i=RSTART+RLENGTH; i <= length($0); i+=LENGTH) { \
-                             for(i=i; $i==\" \"; i++) {};                       \
-                             print HEAD substr($0, i, LENGTH);                  \
-                             HEAD=sprintf(\"%0*s\", RLENGTH, \"\")           \
-                           }                                                    \
-                         }'                                                     "
+	list-aliases = "(                                                               \
+	                  echo \"# GLOBAL\";                                            \
+	                  git config --global --list;                                   \
+	                  echo \"# LOCAL\";                                             \
+	                  git config --local  --list 2>/dev/null;                       \
+	                ) | awk -F ''                                                   \
+	                        -v TERMWIDTH=\"$(tput cols </dev/tty)\"                 \
+	                        'match($0, /^#/) {                                      \
+	                          print                                                 \
+	                         }                                                      \
+	                         match($0, /^alias\\.[^=]+=/) {                         \
+	                           LENGTH=TERMWIDTH-RLENGTH;                            \
+	                           HEAD=substr($0, RSTART, RLENGTH);                    \
+	                           for (i=RSTART+RLENGTH; i <= length($0); i+=LENGTH) { \
+	                             for(i=i; $i==\" \"; i++) {};                       \
+	                             print HEAD substr($0, i, LENGTH);                  \
+	                             HEAD=sprintf(\"%0*s\", RLENGTH, \"\")              \
+	                           }                                                    \
+	                         }'                                                     "
