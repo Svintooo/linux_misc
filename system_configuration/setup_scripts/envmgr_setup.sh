@@ -225,7 +225,7 @@ function is_ok_to_use_path_file() {
   #using global: work_dir
   #using global: owner_string
   #using global: path_file
-  readonly file="$path_file"
+  local file="$path_file"
   local msg=""
   local result=0
 
@@ -253,6 +253,25 @@ function is_ok_to_use_path_file() {
   return $result
 }
 
+function find_line_numbers_where_path_already_exist() {
+  #using global: path_file
+  #using global: protoPATH
+  declare -a result=()
+  local apath="$1"
+  local expanded_path="$( eval "echo \"$apath\"" )"  # Shell expansion
+  local line_no=0 line="" old_path=""
+  for line_no in $(sed -n '/^PATH/=;/TOUCHY/q' "$path_file"); do
+    line="$(sed -n "${line_no}p" "$path_file")"
+    old_path="$(PATH="$protoPATH"; eval "$line"; sed -E "s,:?$protoPATH:?,," <<<"$PATH")"
+    if [[ "$old_path" == "$expanded_path" ]]; then
+      result=( "${result[@]}" "${line_no}" )  # Add line_no to result array
+    fi
+  done
+  (( ${#result[@]} == 0 )) && return 1
+  printf '%d\n' "${result[@]}"
+}
+
+
 case "$command" in
      (list) is_ok_to_use_path_file || exit 1
             declare pathmgrPATHs="$( PATH="$protoPATH" "$path_file" | sed 's/:/\n/g' | grep -v -f <(sed 's/^/^/;s/:/\n^/g' <<<"$protoPATH") )"
@@ -267,24 +286,21 @@ case "$command" in
             echo ;;
       (add) [[ -z "$path" ]] && usage >&2 && exit 1
             is_ok_to_use_path_file || exit 1
-            sed --in-place --regexp-extended '/^PATH=/,/TOUCHY/{ /^\s*$/N; /TOUCHY/s,^,PATH="'"$path"':$PATH"\n, }' "$path_file" ;;
+            find_line_numbers_where_path_already_exist "$path" >/dev/null && exit 0 || true
+            sed --in-place --regexp-extended '/^PATH=/,/TOUCHY/{ :a; /^\s*$/{N;b a}; /TOUCHY/s,^,PATH="'"$path"':$PATH"\n, }' "$path_file" ;;
  (add-last) [[ -z "$path" ]] && usage >&2 && exit 1
             is_ok_to_use_path_file || exit 1
-            sed --in-place --regexp-extended '/^PATH=/,/TOUCHY/{ /^\s*$/N; /TOUCHY/s,^,PATH=$PATH:"'"$path"'"\n, }' "$path_file" ;;
+            find_line_numbers_where_path_already_exist "$path" >/dev/null && exit 0 || true
+            sed --in-place --regexp-extended '/^PATH=/,/TOUCHY/{ :a; /^\s*$/{N;b a}; /TOUCHY/s,^,PATH=$PATH:"'"$path"'"\n, }' "$path_file" ;;
    (remove) [[ -z "$path" ]] && usage >&2 && exit 1
             is_ok_to_use_path_file || exit 1
-            declare rem_path="$( eval "echo \"$path\"" )"  # Shell expansion
-            declare line_no=0 line="" old_path=""
-            for line_no in $(sed -n '/^PATH/=;/TOUCHY/q' "$path_file"); do
-              line="$(sed -n "${line_no}p" "$path_file")"
-              old_path="$(PATH="$protoPATH"; eval "$line"; sed -E "s,:?$protoPATH:?,," <<<"$PATH")"
-              if [[ "$old_path" == "$rem_path" ]]; then
-                sed --in-place "${line_no}d" "$path_file"
-                break
-              fi
-            done ;;
+            mapfile -t line_nums < <( find_line_numbers_where_path_already_exist "$path" )
+            (( ${#line_nums[*]} == 0 )) && exit 0  # Exit if no line numbers was found
+            declare -a sed_args
+            sed_args=( $(printf -- "-e %dd " "${line_nums[@]}") ) || exit 1
+            sed --in-place "${sed_args[@]}" "$path_file" ;;  # Remove each line in $line_nums[*]
             
-  (version) echo 'pathmgr v0.0.9 (aaaaaabbbbbbccccccddddddeeeeeeffffff0123) 2023-05-26T16:48:00+02:00' ;;
+  (version) echo 'pathmgr v0.0.10 (aaaaaabbbbbbccccccddddddeeeeeeffffff0124) 2023-06-13T12:20:00+02:00' ;;
         (*) usage >&2 && exit 1 ;;
 esac
 EOF
