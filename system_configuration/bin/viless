@@ -2,8 +2,15 @@
 
 type vim >/dev/null || exit 1
 
-vimruntime="$(vim - -e -T dumb --cmd 'exe "set t_cm=\<C-M>"|echo $VIMRUNTIME|quit' | tr -d '\015')"
-vimruntime="${vimruntime/$'\n'}"  # Bugfix for qterminal
+# Get path to vims folder under /usr
+vimruntime="$( vim - -e -T dumb --cmd 'exe "set t_cm=\<C-M>"|echo $VIMRUNTIME|quit' )"
+
+# Sometimes a shit ton of extra whitespaces gets included for unknown reason
+# which needs to be removed
+vimruntime="${vimruntime//[[:space:]]/}"
+
+# Check that we got something
 [[ -z "$vimruntime" ]] && echo >&2 "ERROR: VIMRUNTIME not found" && exit 1
 
+# Run the less macro
 "${vimruntime}/macros/less.sh" -c 'set noswapfile' "$@"
