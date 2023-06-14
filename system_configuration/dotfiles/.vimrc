@@ -36,7 +36,7 @@ set noautoindent
 set nostartofline
 set laststatus=2
 set notitle                     " Disable 'Thanks for trying Vim' message
-set shortmess=I                 " Disable startup message
+set shortmess+=I                " Disable startup message
 set softtabstop=2               " Number of spaces inserted instead of tab characters
 set tabstop=2
 set expandtab                   " Replace tabs with spaces
