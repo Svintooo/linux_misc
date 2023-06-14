@@ -10,6 +10,9 @@ export HISTSIZE=-1
 export HISTFILESIZE=-1
 export HISTCONTROL=ignoreboth
 
+# Disable History Expansion
+set +H
+
 # Source .bashrc_*
 [[ -f ~/.bashrc_commands    ]] && . ~/.bashrc_commands
 [[ -f ~/.bashrc_starship    ]] && . ~/.bashrc_starship
