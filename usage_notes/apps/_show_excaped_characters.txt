@@ -1,0 +1,3 @@
+# Turn invisible characters into escape codes
+echo "${VAR@Q}"
+... | { while read -r line; do echo "${line@Q}"; done; }
