@@ -41,6 +41,7 @@ alias sudo='sudo '
 # dd - Show progress bar
 alias dd='dd status=progress'
 
+alias tree='tree -F --dirsfirst'
 alias pj=pijul
 
 # digns: lookup name servers for a domain, without using whois
