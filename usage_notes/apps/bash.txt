@@ -14,6 +14,8 @@ https://stackoverflow.com/questions/64786/error-handling-in-bash
 ## Maybe use when writing scripts
 set -Eeuxo pipefail  # https://vaneyckt.io/posts/safer_bash_scripts_with_set_euxo_pipefail/
 shopt -s extglob
+#Tips to use long options for everything for readability (set -o something)
+#Include in all scripts: https://github.com/DaveJarvis/keenwrite/blob/main/scripts/build-template
 
 ## Get exit code from each command in a pipe
 ${PIPESTATUS[@]}
@@ -22,14 +24,25 @@ ${PIPESTATUS[@]}
 # 1 0 1 0
 
 ## Get script info
-# Preserve symlink to script
-readonly script="${BASH_SOURCE##*/}"
-readonly scriptpath="$(CDPATH= cd -- "${BASH_SOURCE%/*}" 2>/dev/null 1>&2 && echo "$(pwd)/${BASH_SOURCE##*/}")"
-readonly scriptdir="$(CDPATH= cd -- "${BASH_SOURCE%/*}" 2>/dev/null 1>&2 && pwd)"
-# Resolve symlink to script
-readonly script="$(basename "$(readlink -e "$BASH_SOURCE")")"
-readonly scriptpath="$(readlink -e -- "$BASH_SOURCE")"
-readonly scriptdir="$(dirname "$(readlink -e "$BASH_SOURCE")")"
+# Preserve Eventual Symlink(READABLE)
+readonly SCRIPT_RELPATH="${BASH_SOURCE[${#BASH_SOURCE[@]}-1]}"
+readonly SCRIPT_RELDIR="$(dirname "$SCRIPT_RELPATH")"
+readonly SCRIPT_NAME="$(basename "$SCRIPT_RELPATH")"
+readonly SCRIPT_DIR="$(CDPATH="" cd -- "$SCRIPT_RELDIR" 2>/dev/null 1>&2 && pwd)"
+readonly SCRIPT_PATH="${SCRIPT_DIR}/${SCRIPT_NAME}"
+# Preserve Eventual Symlink(STANDALONES)
+readonly SCRIPT_NAME="${BASH_SOURCE[${#BASH_SOURCE[@]}-1]##*/}"
+readonly SCRIPT_DIR="$(CDPATH="" cd -- "${BASH_SOURCE[${#BASH_SOURCE[@]}-1]%/*}" 2>/dev/null 1>&2 && pwd)"
+readonly SCRIPT_PATH="$(CDPATH="" cd -- "${BASH_SOURCE[${#BASH_SOURCE[@]}-1]%/*}" 2>/dev/null 1>&2 && echo "$(pwd)/${BASH_SOURCE[${#BASH_SOURCE[@]}-1]##*/}")"
+# Resolve Eventual Symlink(READABLE)
+readonly SCRIPT_RELPATH="${BASH_SOURCE[${#BASH_SOURCE[@]}-1]}"
+readonly SCRIPT_PATH="$(readlink -e -- "${SCRIPT_RELPATH}")"
+readonly SCRIPT_NAME="$(basename "$SCRIPT_PATH")"
+readonly SCRIPT_DIR="$(dirname "$SCRIPT_PATH")"
+# Resolve Eventual Symlink(STANDALONES)
+readonly SCRIPT_PATH="$(readlink -e -- "${BASH_SOURCE[${#BASH_SOURCE[@]}-1]}")"
+readonly SCRIPT_NAME="$(basename "$(readlink -e "${BASH_SOURCE[${#BASH_SOURCE[@]}-1]}")")"
+readonly SCRIPT_DIR="$(dirname "$(readlink -e "${BASH_SOURCE[${#BASH_SOURCE[@]}-1]}")")"
 
 ## List all defined functions
 declare -F  # Names only
@@ -158,4 +171,11 @@ history -d -5--1  # Delete last 5 commands
 (IFS=:;cmd=echo:Hello:World;$cmd)
 # Print space
 (IFS=:;cmd=base64:-d;$cmd<<<IA==)
+
+## TRAP
+... script start ...
+function cleanup() { ...; }
+cleanup
+trap cleanup EXIT HUP INT TERM
+... rest of script ...
 
