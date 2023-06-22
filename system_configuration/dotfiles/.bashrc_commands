@@ -44,6 +44,7 @@ alias dd='dd status=progress'
 alias rg.='rg --hidden --no-ignore'
 alias tree='tree -F --dirsfirst'
 alias pj=pijul
+type -P fdfind >/dev/null && alias fd=fdfind  #Ubuntu fix
 
 # digns: lookup name servers for a domain, without using whois
 function digns() {
