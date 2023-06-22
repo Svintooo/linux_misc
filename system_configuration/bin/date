@@ -2,10 +2,10 @@
 bin_name=date
 
 # Path to this script
-readonly scriptpath="$(CDPATH= cd -- "${BASH_SOURCE%/*}" 2>/dev/null 1>&2 && echo "$(pwd)/${BASH_SOURCE##*/}")"
+readonly SCRIPT_PATH="$(CDPATH="" cd -- "${BASH_SOURCE[${#BASH_SOURCE[@]}-1]%/*}" 2>/dev/null 1>&2 && echo "$(pwd)/${BASH_SOURCE[${#BASH_SOURCE[@]}-1]##*/}")"
 
 # Locate binary
-bin="$(type -a -p "$bin_name" | grep -v "$scriptpath" | head -n1)"
+bin="$(type -a -p "$bin_name" | grep -v "$SCRIPT_PATH" | head -n1)"
 [[ -z "$bin" ]] && exit 1
 
 # Execute binary
