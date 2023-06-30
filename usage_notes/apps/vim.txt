@@ -18,6 +18,7 @@ vim <file> -c "setf json"
 ctrl-w + piltangenter
 ctrl+w + w  # Toggle
 
-D   # Delete to end-of-line
-d}  # Delete to next empty line
-dG  # Delete to end-of-file
+D    # Delete to end-of-line
+d}   # Delete to next empty line
+dgg  # Delete to beginning-of-file
+dG   # Delete to end-of-file
