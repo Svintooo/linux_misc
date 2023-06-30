@@ -26,6 +26,10 @@ nnoremap <S-F3> N
 nmap <F4> :set autoindent!<CR>
 imap <F4> <Esc>:set autoindent!<CR>i<Right>
 
+" Toggle wrapping
+nmap <F5> :set wrap!<CR>
+imap <F5> <Esc>:set wrap!<CR>i<Right>
+
 " Misc
 set clipboard=unnamed           " Copy to system clipboard
 set encoding=utf-8              " Set UTF-8 encoding
