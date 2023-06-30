@@ -8,8 +8,9 @@ chmod a+x guix-install.sh
 #2. Setup ENVs
 mkdir -p ~/.config/guix/packages
 export GUIX_PACKAGE_PATH="$HOME/.config/guix/packages"
-export GUIX_PROFILE="$HOME/.config/guix/current"
-export PATH="$GUIX_PROFILE/bin:$PATH"
+export GUIX_PROFILE="$HOME/.guix-profile"
+export PATH="$HOME/.config/guix/current/bin:$PATH"
+source "$GUIX_PROFILE/etc/profile"
 hash guix
 
 #3. Update guix packages
@@ -28,3 +29,8 @@ cat >~/.config/guix/packages/my-glibc-locales.scm <<EOF
    #:name "my-glibc-locales"))
 EOF
 guix install my-glibc-locales
+
+
+## Misc
+guix package -l  # List installed packages in all generations
+guix package -I  # List installed packages
