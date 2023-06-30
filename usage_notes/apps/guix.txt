@@ -1,0 +1,30 @@
+## Install guix package manager on any OS
+
+#1. Run official install script
+wget https://git.savannah.gnu.org/cgit/guix.git/plain/etc/guix-install.sh
+chmod a+x guix-install.sh
+./guix-install.sh
+
+#2. Setup ENVs
+mkdir -p ~/.config/guix/packages
+export GUIX_PACKAGE_PATH="$HOME/.config/guix/packages"
+export GUIX_PROFILE="$HOME/.config/guix/current"
+export PATH="$GUIX_PROFILE/bin:$PATH"
+hash guix
+
+#3. Update guix packages
+guix pull
+guix package -u
+
+#4. Install locales
+cat >~/.config/guix/packages/my-glibc-locales.scm <<EOF
+(define-module (my-glibc-locales)
+  #:use-module (gnu packages base))
+;;I have no idea what I am doing!!!
+(define-public my-glibc-locales
+  (make-glibc-utf8-locales
+   glibc
+   #:locales (list "en_US" "en_DK" "sv_SE" "ja_JP")
+   #:name "my-glibc-locales"))
+EOF
+guix install my-glibc-locales
