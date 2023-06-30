@@ -18,10 +18,17 @@ def get_methods(object, spacing=20, desc_width=90):
 
 
 # Create environment
-python -m venv <folder-name>
+python3 -I -m venv <folder-name>
+<folder-name>/bin/python3 -I -m pip install ...
 source <folder-name>/bin/activate
 ...
 deactivate
+
+
+# Use -I to avoid running ./collections.py
+echo 'print("Hacked");exit()' > ./collections.py
+python -m pydoc csv      # Hacked
+python3 -I -m pydoc csv
 
 
 # Better regexp
