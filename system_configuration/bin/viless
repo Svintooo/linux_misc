@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# Only run if vim exists
 type vim >/dev/null || exit 1
 
 # Get path to vims folder under /usr
