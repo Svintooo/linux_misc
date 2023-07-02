@@ -1,0 +1,31 @@
+#
+# Shebang takes one path, and at maximum 1 argument.
+#
+
+## Examples
+#!/bin/bash             # ok
+#!/usr/sbin/python -I   # ok
+#!/usr/bin/env ruby -U  # error ("ruby -U": No such file or directory)
+
+## Workaround 1: env -S (not supported on old env versions)
+#!/usr/bin/env -S ruby -U
+
+## Workaround 2: perl (not supported in nixOS)
+#!/usr/bin/perl -e print "hello\n"
+
+
+
+#
+# Shebang takes only absoluta paths
+#
+
+## Examples
+#!/bin/bash          # ok
+#!./my/local/python  # error
+
+## Workaround 1: perl (not supported on nixOS)
+#!/usr/bin/perl -e $bin="my/local/python"; $_=$ARGV[0]; exec(s/\w+$/$bin/r,$_)
+
+## Workaround 2: env -S perl (not supported on old env versions)
+#!/usr/bin/env -S perl -e'$bin=".venv/bin/python3"; $_=$ARGV[0]; exec(s/\w+$/$bin/r,$_)'
+
