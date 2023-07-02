@@ -1,2 +1,10 @@
-#!/usr/bin/env bash
-{ (($# == 0)) && cat || echo "$@"; } | python -bbs -c "import sys; print(sys.stdin.read().strip().title())"
+#!/usr/bin/env python3
+
+import sys
+
+if len(sys.argv) > 1:
+  string = "".join(sys.argv[1:])
+else:
+  string = sys.stdin.read().strip()
+
+print(string.title())
