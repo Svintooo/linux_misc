@@ -1,0 +1,95 @@
+#------------------------------------------------------------------------------
+# Programming
+#------------------------------------------------------------------------------
+
+# 100% test coverage
+https://lobste.rs/s/alwaiy/100_test_coverage
+
+# Godbolt - generate assembly from code
+https://godbolt.org/
+
+
+
+#------------------------------------------------------------------------------
+# Rust
+#------------------------------------------------------------------------------
+
+# lilos - small OS for embedded Rust apps
+https://github.com/cbiffle/lilos/blob/main/doc/intro.adoc
+
+# Mental Model for async await
+http://cliffle.com/blog/async-inversion/
+
+# My list of features I hope will land in rust
+cargo-script: https://github.com/rust-lang/cargo/issues/12207
+
+
+
+#------------------------------------------------------------------------------
+# Games - Small Online
+#------------------------------------------------------------------------------
+
+# goodbye monster
+https://goodbye.monster/
+
+# Amigalive
+https://www.amigalive.com/
+
+
+
+#------------------------------------------------------------------------------
+# Python
+#------------------------------------------------------------------------------
+
+# You Don't Need __all__
+https://lobste.rs/s/rlodgq/you_don_t_need_all
+
+
+
+#------------------------------------------------------------------------------
+# Android
+#------------------------------------------------------------------------------
+
+# Programming on Android Tablet
+https://denizaksimsek.com/2023/programming-on-a-tablet/
+
+
+
+#------------------------------------------------------------------------------
+# Amiga
+#------------------------------------------------------------------------------
+
+# USB2Floppy Hardware Emulator
+http://digitalretrobay.co.uk/digital-godrive-for-commodore-amiga-500-500/
+
+
+
+#------------------------------------------------------------------------------
+# WebDev
+#------------------------------------------------------------------------------
+
+# pagefind - search engine for your webpage
+https://lobste.rs/s/saukap/static_site_update_self_hosted_search_via
+https://pagefind.app/
+
+
+
+#------------------------------------------------------------------------------
+# Security
+#------------------------------------------------------------------------------
+
+# Check if password has been part of security breach
+https://haveibeenpwned.com/Passwords
+
+
+
+#------------------------------------------------------------------------------
+# Misc
+#------------------------------------------------------------------------------
+
+# Discord video/sound sharing in linux (2023)
+https://lemmy.ml/post/1557630
+
+# Cross-platform IRC client written in Rust (2023)
+https://github.com/squidowl/halloy
+
