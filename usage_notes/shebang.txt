@@ -1,8 +1,25 @@
 #
+# Shebang is limited to a specific amount of bytes (depending on Linux kernel version).
+#
+
+## Example 256b, ok:
+#!/usr/bin/awk BEGIN{print "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb012345678"}
+#!/usr/bin/env -S awk 'BEGIN{print "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb012345678"}'
+
+## Example 257b, error:
+#!/usr/bin/awk BEGIN{print "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb0123456789"}
+#!/usr/bin/env -S awk 'BEGIN{print "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb0123456789"}'
+
+## Workaround: perl, supports parsing its shebang by itself, (non nixOS compat)
+#!/usr/bin/perl -MEncode -MList::Util=shuffle -MFindBin -MConfig -M...
+
+
+
+#
 # Shebang takes one path, and at maximum 1 argument.
 #
 
-## Examples
+## Examples:
 #!/bin/bash             # ok
 #!/usr/sbin/python -I   # ok
 #!/usr/bin/env ruby -U  # error ("ruby -U": No such file or directory)
@@ -19,7 +36,7 @@
 # Shebang takes only absoluta paths
 #
 
-## Examples
+## Examples:
 #!/bin/bash          # ok
 #!./my/local/python  # error
 
