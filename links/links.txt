@@ -20,6 +20,11 @@ https://github.com/cbiffle/lilos/blob/main/doc/intro.adoc
 # Mental Model for async await
 http://cliffle.com/blog/async-inversion/
 
+# serde - implementing my own data format
+https://serde.rs/data-format.html
+https://docs.rs/serde_with/1.6.0/serde_with/index.html
+https://serde.rs/custom-date-format.html
+
 # My list of features I hope will land in rust
 cargo-script: https://github.com/rust-lang/cargo/issues/12207
 
