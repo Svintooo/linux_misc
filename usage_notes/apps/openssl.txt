@@ -3,13 +3,87 @@ DOMAIN=*
 NAME=catch-all
 SIZE=4096
 openssl genrsa "$SIZE" > "$NAME".key.pem
-openssl req -new -x509 -nodes -sha1 -days 3650 -key "$NAME".key.pem > "$NAME".crt.pem
+openssl req -new -x509 -nodes -sha1 -days 3650 -key "$NAME".key.pem > "$NAME".cert.pem
 #TODO: insert $DOMAIN here somewhere
-openssl x509 -noout -fingerprint -text < "$NAME".crt.pem > "$NAME".crt.info
-cat "$NAME".crt.pem "$NAME".key.pem > "$NAME".crt-key.pem
-chmod 400 "$NAME".key.pem "$NAME".crt-key.pem
+openssl x509 -noout -fingerprint -text < "$NAME".cert.pem > "$NAME".cert.info
+cat "$NAME".cert.pem "$NAME".key.pem > "$NAME".cert-key.pem
+chmod 400 "$NAME".key.pem "$NAME".cert-key.pem
+
+
+# Create CA chain (ERR: verification does not work)
+SIZE=4096
+## CA
+mkdir ca
+openssl req -new -extensions v3_ca -subj "/C=SE/CN=CA" -newkey rsa:$SIZE -nodes -out ca/ca.csr.pem -keyout ca/ca.key.pem
+openssl x509 -trustout -signkey ca/ca.key.pem -days 365 -req -in ca/ca.csr.pem -out ca/ca.cert.pem
+## IntermediateA
+A=A
+mkdir int$A
+openssl genrsa -out int$A/int$A.key.pem $SIZE
+openssl req -new -extensions v3_ca -subj "/C=SE/CN=int$A" -key int$A/int$A.key.pem -out int$A/int$A.csr.pem
+openssl x509 -req -days 365 -in int$A/int$A.csr.pem -CA ca/ca.cert.pem -CAkey ca/ca.key.pem -set_serial 01 -out int$A/int$A.cert.pem
+## Intermediate*
+B=B
+mkdir int$B
+openssl genrsa -out int$B/int$B.key.pem $SIZE
+openssl req -new -extensions v3_ca -subj "/C=SE/CN=int$B" -key int$B/int$B.key.pem -out int$B/int$B.csr.pem
+openssl x509 -req -days 365 -in int$B/int$B.csr.pem -CA int$A/int$A.cert.pem -CAkey int$A/int$A.key.pem -set_serial 01 -out int$B/int$B.cert.pem
+## Cert
+DOMAIN=domain.tld
+mkdir $DOMAIN
+openssl genrsa -out $DOMAIN/$DOMAIN.key.pem $SIZE
+openssl req -new -subj "/C=SE/CN=$DOMAIN" -addext "subjectAltName = DNS:$DOMAIN" -key $DOMAIN/$DOMAIN.key.pem -out $DOMAIN/$DOMAIN.csr.pem
+openssl x509 -req -days 365 -in $DOMAIN/$DOMAIN.csr.pem -CA int$B/int$B.cert.pem -CAkey int$B/int$B.key.pem -set_serial 01 -out $DOMAIN/$DOMAIN.cert.pem
+
+
+# Check that key and cert belongs together
+## Manually Compare
+openssl rsa  -noout -modulus -in domain.tld.key.pem  | openssl md5 && \
+openssl x509 -noout -modulus -in domain.tld.cert.pem | openssl md5
+## Using diff
+diff >/dev/null \
+     <(openssl rsa  -noout -modulus -in domain.tld.key.pem) \
+     <(openssl x509 -noout -modulus -in domain.tld.cert.pem) \
+  && echo y || echo f
+
+
+# Verify Cert chains
+openssl verify -CAfile ca.cert.pem domain.tld.cert.pem
+openssl verify -CAfile ca.cert.pem -untrusted int.cert.pem domain.tld.cert.pem
+openssl verify -CAfile ca.cert.pem -untrusted intA.cert.pem -untrusted intB.cert.pem domain.tld.cert.pem
+openssl verify -no-CAfile -no-CApath -partial_chain -trusted int.cert.pem domain.tld.cert.pem
+
+
+# Show cert files
+openssl rsa  -noout -text -in domain.key.pem
+openssl req  -noout -text -in domain.csr.pem
+openssl x509 -noout -text -in domain.cert.pem
+
 
 # s_client
 openssl s_client -connect www.domain.tld:https -CApath /etc/ssl
 openssl s_client -connect server-address:port -CApath /etc/ssl
 openssl s_client -connect server-address:port -servername sni-address -CApath /etc/ssl
+
+
+# convert between cert formats
+CERT="name"
+## PEM to PKCS#12 (.p12, .pfx)
+openssl pkcs12 -export -in $CERT.cert.pem -inkey $CERT.key.pem -out $CERT.p12
+openssl pkcs12 -export -in $CERT.cert.pem -inkey $CERT.key.pem -out $CERT.p12 -certfile intermediates.file
+## PKCS#12 to PEM
+openssl pkcs12 -in $CERT.p12 -clcerts -nokeys -out $CERT.cert.pem
+openssl pkcs12 -in $CERT.p12 -nocerts -nodes  -out $CERT.key.pem
+openssl pkcs12 -in $CERT.p12          -nodes  -out $CERT.cert_key.pem
+## PEM to DER
+openssl rsa  -inform pem -outform der -in $CERT.key.pem  -out $CERT.key.der
+openssl x509 -inform pem -outform der -in $CERT.cert.pem -out $CERT.cert.der
+## DER to PEM
+openssl rsa  -inform der -outform pem -in $CERT.key.der  -out $CERT.key.pem
+openssl x509 -inform der -outform pem -in $CERT.cert.der -out $CERT.cert.pem
+## PEM to PKCS#7 (.p7b, .p7c)
+openssl crl2pkcs7 -nocrl -certfile $CERT.cert.pem -out $CERT.p7b -certfile intermediates.file
+## PCKS#7 to PEM
+openssl pkcs7 -print_certs -in $CERT.p7b | sed '1,/END/!d;/BEGIN/,/END/!d' > $CERT.cert.pem
+openssl pkcs7 -print_certs -in $CERT.p7b | sed '1,/END/ d;/BEGIN/,/END/!d' > intermediates.file
+
