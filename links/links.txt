@@ -8,17 +8,19 @@ https://lobste.rs/s/alwaiy/100_test_coverage
 # Godbolt - generate assembly from code
 https://godbolt.org/
 
+# Unix sockets works on all platforms, use it
+https://lobste.rs/s/ohlq7i/binding_on_port_0
+
 
 
 #------------------------------------------------------------------------------
 # Rust
 #------------------------------------------------------------------------------
 
-# lilos - small OS for embedded Rust apps
-https://github.com/cbiffle/lilos/blob/main/doc/intro.adoc
-
-# Mental Model for async await
+# Learning material, and crate tips
 http://cliffle.com/blog/async-inversion/
+https://lobste.rs/s/2kvgav/learning_learn_rust
+https://github.com/cbiffle/lilos/blob/main/doc/intro.adoc
 
 # serde - implementing my own data format
 https://serde.rs/data-format.html
@@ -46,6 +48,9 @@ https://goodbye.monster/
 
 # Amigalive
 https://www.amigalive.com/
+
+# Bottles - Promising Wine wrapper?
+https://usebottles.com/
 
 
 
@@ -92,6 +97,11 @@ https://pagefind.app/
 
 # Check if password has been part of security breach
 https://haveibeenpwned.com/Passwords
+
+# Use common tools as hacking equipment
+https://gtfobins.github.io/
+https://lolbas-project.github.io/
+https://lots-project.com/
 
 
 
