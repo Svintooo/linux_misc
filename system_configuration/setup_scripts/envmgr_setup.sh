@@ -149,7 +149,7 @@ function is_ok_to_modify_file() {
     msg="${msg}     Either edit the file manually OR delete it and try again."
   fi
 
-  [[ -n "$msg" ]] && echo >&2 "$msg"
+  [[ -n "$msg" ]] && echo >&2 -e "$msg"
   return $result
 }
 
