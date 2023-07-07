@@ -3,3 +3,23 @@
 
 # Update font cache (root not needed)
 fc-cache -f -v
+
+# Font Lingo
+#https://github.com/ryanoasis/nerd-fonts/wiki/FAQ-and-Troubleshooting#what-do-these-acronym-variations-in-the-font-name-mean-lg-l-m-s-dz-sz
+LG - Line Gap
+LGL - Large
+LGM - Medium
+LGS - Small
+DZ - Dotted Zero
+SZ - Slashed Zero
+Mono - Monospace
+Propo - Proportional
+
+# Use letters not on keyboard
+1. use '\uxxxx' or '\Uxxxxx' with `echo $''` or `echo -e ""`
+2. ctrl-shift-u <write hex code here> enter
+# Example codes
+░ - 2591
+▒ - 2592
+▓ - 2593
+ - eb4b
