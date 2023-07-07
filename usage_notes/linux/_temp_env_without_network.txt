@@ -1,0 +1,12 @@
+# use unshare -n program ...
+# sudo is needed if kernel is not built with CONFIG_NET_NS=y
+
+# Disable network for one run
+unshare -n program ...
+
+# Disable network for a session
+unshare -n bash
+# With sudo
+sudo unshare -n bash
+sudo -u user -i
+program ...
