@@ -1,0 +1,4 @@
+# Pipe to clipboard
+xclip -sel c < input_file
+xclip -sel c <(echo "hello")
+xclip -sel c <<<"hello"
