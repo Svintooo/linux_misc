@@ -2,14 +2,10 @@
 # Programming
 #------------------------------------------------------------------------------
 
-# 100% test coverage
-https://lobste.rs/s/alwaiy/100_test_coverage
-
-# Godbolt - generate assembly from code
-https://godbolt.org/
-
-# Unix sockets works on all platforms, use it
-https://lobste.rs/s/ohlq7i/binding_on_port_0
+https://lobste.rs/s/alwaiy/100_test_coverage  # 100% test coverage
+https://godbolt.org/  # Generate assembly from code
+https://lobste.rs/s/ohlq7i/binding_on_port_0  # Unix sockets works on all platforms, use it
+https://lobste.rs/s/q6wjmt/mold_2_0_0  # Fast linker
 
 
 
