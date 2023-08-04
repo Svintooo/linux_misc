@@ -1,0 +1,5 @@
+# Resque Boot
+# # Change
+linux /boot/linuz root=/dev/sda1 ro quiet
+# # To
+linux /boot/linuz root=/dev/sda1 rw quiet init=bin/bash
