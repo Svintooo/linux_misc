@@ -1,0 +1,4 @@
+# Guide: https://superuser.com/questions/307678/how-do-i-extract-files-from-an-msi-package
+# Must use full paths (IMPORTANT)
+# TARGETDIR will be created.
+msiexec /a drive:\filepath\to\MSI\file /qb TARGETDIR=drive:\filepath\to\target\folder
