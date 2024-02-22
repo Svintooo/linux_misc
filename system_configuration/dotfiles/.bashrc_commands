@@ -45,7 +45,7 @@ alias rg.='rg --hidden --no-ignore'
 alias tree='tree -F --dirsfirst'
 alias pj=pijul
 type -P fdfind >/dev/null && alias fd=fdfind  #Ubuntu fix
-type fd >/dev/null && alias fd.='fd --hidden --no-ignore'
+type -t fd >/dev/null && alias fd.='fd --hidden --no-ignore'
 
 # digns: lookup name servers for a domain, without using whois
 function digns() {
