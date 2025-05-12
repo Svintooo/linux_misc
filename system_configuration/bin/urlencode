@@ -1,13 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/env bash
 
-import sys
-import urllib.parse
-
-if len(sys.argv) > 1:
-  string = "".join(sys.argv[1:])
-else:
-  string = sys.stdin.read().strip()
-
-string_result = urllib.parse.quote(string, safe="")
-
-print( string_result )
+if [[ "$#" == "0" ]]; then
+  sed -z 's/\n$//'
+else
+  printf '%s' "$*"
+fi \
+    | jq --slurp --raw-input --raw-output @uri
