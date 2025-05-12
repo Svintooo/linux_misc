@@ -186,3 +186,22 @@ cleanup
 trap cleanup EXIT HUP INT TERM
 ... rest of script ...
 
+## How bash sources files during startup
+# Bash Strategies
+profile:
+    init: /etc/profile && (~/.bash_profile || ~/.profile)
+    logout: ~/.bash_logout
+bashrc:
+    init: /etc/bash.bashrc && ~/.bashrc
+nothing:
+    comment: No files are sourced
+# Bash Invocations
+Login Shell:
+    interactive(true):  profile
+    interactive(false): profile, without .bash_logout
+Normal Shell:
+    interactive(true):  bashrc
+    interactive(false): nothing
+SSH:
+    interactive(true):  profile
+    interactive(false): bashrc
