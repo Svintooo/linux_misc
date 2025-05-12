@@ -1,0 +1,20 @@
+zypper install <PKG>
+       in      <PKG>
+zypper remove
+       rm      <PKG>
+
+zypper repos
+       lr
+zypper addrepo <URL> <NAME>
+       ar      <URL> <NAME>
+zypper removerepo <NAME>
+       rr         <NAME>
+
+# Search package that contain file
+# # For uninstalled packages
+zypper search --provides --match-exact /usr/sbin/usermod
+# # For installed packages
+rpm -qf /usr/sbin/usermod
+
+# List file in installed package
+rpm -ql <package>
