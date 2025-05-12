@@ -1,0 +1,1 @@
+docker run --init --rm -it --entrypoint /bin/sh IMAGE
