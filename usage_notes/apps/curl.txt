@@ -7,6 +7,9 @@ curl -X POST -H "Content-Type: application/json" -d @file.json https://api.asdf.
 curl --user "EMAIL:PASWORD" "imaps://SERVER" -X CAPABILITY
 curl --user "EMAIL:PASWORD" "imaps://SERVER" -X CAPABILITY --login-options AUTH=PLAIN
 
+# Check if URL works
+curl --output /dev/null --location --silent --head --fail "URL"
+
 #https://daniel.haxx.se/blog/wp-content/uploads/2020/01/sticker-cheat-sheet.png
 hide process    verbose               extra info          output            timeout
  -s              -v                    -w "format"         -O                -m <seconds>

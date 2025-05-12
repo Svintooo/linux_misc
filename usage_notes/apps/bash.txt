@@ -61,6 +61,13 @@ shopt -s dotglob; command; shopt -u dotglob
 GLOBIGNORE=.:.. ; command ; unset GLOBIGNORE
 ( GLOBIGNORE=.:.. ; command )
 
+## Glob everything except . and .. (POSIX compliant I think)
+ls -1d .[^.]* *
+ls -1d ./.[^.]* ./*
+
+## Get pure vanilla no-config shell
+env -i bash --norc --noprofile
+
 ## Loop over files with whitespaces in names
 IFS=$'\n\t'
 for file in ./* ; do

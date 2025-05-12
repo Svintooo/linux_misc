@@ -5,6 +5,12 @@ git config --global asdf.qwer "affor6giog4of"
 git config --global --unset <configname>
 git config --global --edit
 
+# Checkout to separate workdir path
+git worktree add    <worktree-path> <commit>
+git worktree remove <worktree-path>
+#Ex: git worktree add .worktree-tmp c121d1d
+#Ex: git worktree add .worktree-tmp master
+
 # Use other user
 # # Manual set author
   git commit --amend --author="Name <email>" --no-edit --date=now
