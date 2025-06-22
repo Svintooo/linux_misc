@@ -12,6 +12,8 @@ apt install <asdf>
 apt remove <package>
 apt autoremove  # tar bort alla paket som inte behövs längre
 
+apt-mark auto <package>  # Mark the package as automatically installed (not manually installed)
+
 # Check installed version, install different version
 apt policy <asdf>
 apt upgrade <asdf>=<version>

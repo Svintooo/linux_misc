@@ -1,0 +1,2 @@
+# Extract rpm file
+rpm2cpio <file> | cpio --extract --make-directories --preserve-modification-time --directory=<extract-dir>

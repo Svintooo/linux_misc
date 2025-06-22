@@ -6,7 +6,7 @@ CDPATH=""
 readonly SCRIPT_DIR="$(dirname "$(readlink -e "${BASH_SOURCE[${#BASH_SOURCE[@]}-1]}")")"
 readonly BIN_DIR_USER="$HOME/.local/bin"
 readonly BIN_DIR_SCRIPTS="$(readlink -e -- "${SCRIPT_DIR}/../bin")"
-[[ -n "$BIN_DIR_SCRIPTS" ]] || { echo >&2 "Scripts bin folder not found"; exit 1; }
+[[ -d "$BIN_DIR_SCRIPTS" ]] || { echo >&2 "Scripts bin folder not found"; exit 1; }
 
 # create bin/
 mkdir -p "$BIN_DIR_USER"
