@@ -1,0 +1,23 @@
+[alias]
+	alias = !git config alias-settings.list-aliases | sh && true
+[alias-settings]
+	list-aliases = "(
+	                  echo \"# GLOBAL\";                                            \
+	                  git config --global --list;                                   \
+	                  echo \"# LOCAL\";                                             \
+	                  git config --local  --list 2>/dev/null;                       \
+	                ) | sed 's/=/ = /'                                              \
+	                  | awk -F ''                                                   \
+	                        -v TERMWIDTH=\"$(tput cols </dev/tty)\"                 \
+	                        'match($0, /^#/) {                                      \
+	                           print                                                \
+	                         }                                                      \
+	                         match($0, /^alias\\.[^=]+ *= */) {                     \
+	                           LENGTH=TERMWIDTH-RLENGTH;                            \
+	                           HEAD=substr($0, RSTART, RLENGTH);                    \
+	                           for (i=RSTART+RLENGTH; i <= length($0); i+=LENGTH) { \
+	                             for(i=i; $i==\" \"; i++) {};                       \
+	                             print HEAD substr($0, i, LENGTH);                  \
+	                             HEAD=sprintf(\"%0*s\", RLENGTH, \"\")              \
+	                           }                                                    \
+	                         }'                                                     "
