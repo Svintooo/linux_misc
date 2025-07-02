@@ -3,8 +3,11 @@ ssh -o StrictHostKeyChecking ...
 
 ssh-copy-id -i ~/.ssh/user@localhost.pub user@remotehost -p 22001
 
-# Verify host fingerprint
+# Verify host/key fingerprints
 ssh-keygen -l -f /etc/ssh/ssh_host_...
+ssh-keygen -l -f ~/.ssh/known_hosts
+ssh-keygen -l -f ~/.ssh/authorized_keys
+
 
 ssh -o StrictHostKeyChecking=no ...
 
